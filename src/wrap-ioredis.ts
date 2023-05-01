@@ -1,16 +1,11 @@
 import Redis, {ClusterNode, ClusterOptions, Redis as R} from 'ioredis';
-import {
-  CacheClient,
-  Configurations,
-  CredentialProvider,
-} from '@gomomento/sdk';
+import {CacheClient, Configurations, CredentialProvider} from '@gomomento/sdk';
 import {MomentoIORedis, MomentoRedisAdapter} from './momento-redis-adapter';
 
-
 interface config {
-  momentoEnabled: boolean
-  defaultTTLSeconds: number,
-  cacheName: string
+  momentoEnabled: boolean;
+  defaultTTLSeconds: number;
+  cacheName: string;
 }
 
 const authTokenEnvVarName = 'MOMENTO_AUTH_TOKEN';
@@ -19,16 +14,18 @@ function parseConfig(): config {
   const enableMomentoVar = process.env['MOMENTO_ENABLED'],
     defaultTTLSecondsVar = process.env['DEFAULT_TTL_SECONDS'],
     cacheNameVar = process.env['CACHE_NAME'];
-  let enableMomento = false, defaultTTLSeconds = 86400, cacheName = '';
+  let enableMomento = false,
+    defaultTTLSeconds = 86400,
+    cacheName = '';
 
-  if (enableMomentoVar != undefined && enableMomentoVar === 'true') {
+  if (enableMomentoVar !== undefined && enableMomentoVar === 'true') {
     enableMomento = true;
-    if (defaultTTLSecondsVar == undefined) {
+    if (defaultTTLSecondsVar === undefined) {
       throw new Error('missing DEFAULT_TTL env var when using momento');
     } else {
       defaultTTLSeconds = Number.parseInt(defaultTTLSecondsVar);
     }
-    if (cacheNameVar == undefined || cacheNameVar == '') {
+    if (cacheNameVar === undefined || cacheNameVar === '') {
       throw new Error('missing CACHE_NAME env var when using momento');
     } else {
       cacheName = cacheNameVar;
@@ -52,14 +49,17 @@ export function NewIORedisWrapper(): MomentoIORedis {
         }),
         defaultTtlSeconds: config.defaultTTLSeconds,
       }),
-      config.cacheName,
+      config.cacheName
     );
   } else {
     return new Redis();
   }
 }
 
-export function NewIORedisClusterWrapper(startupNodes: ClusterNode[], options?: ClusterOptions): MomentoIORedis {
+export function NewIORedisClusterWrapper(
+  startupNodes: ClusterNode[],
+  options?: ClusterOptions
+): MomentoIORedis {
   const config = parseConfig();
   if (config.momentoEnabled) {
     return new MomentoRedisAdapter(
@@ -70,7 +70,7 @@ export function NewIORedisClusterWrapper(startupNodes: ClusterNode[], options?: 
         }),
         defaultTtlSeconds: config.defaultTTLSeconds,
       }),
-      config.cacheName,
+      config.cacheName
     );
   } else {
     return new R.Cluster(startupNodes, options);

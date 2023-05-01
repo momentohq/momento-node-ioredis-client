@@ -44,7 +44,6 @@ describe('simple get and set', () => {
   });
 });
 describe('get and set with expiration', () => {
-
   it('should expire a value after a number of seconds', async () => {
     const key = v4();
     const value = v4();
@@ -139,12 +138,24 @@ describe('get and set with existence conditions', () => {
     const value = v4();
     const timestampInMillis = Date.now() + 3000;
 
-    const setResult = await client.set(key, value, 'PXAT', timestampInMillis, 'NX');
+    const setResult = await client.set(
+      key,
+      value,
+      'PXAT',
+      timestampInMillis,
+      'NX'
+    );
     expect(setResult).toEqual('OK');
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    const setResult2 = await client.set(key, value, 'PXAT', timestampInMillis, 'NX');
+    const setResult2 = await client.set(
+      key,
+      value,
+      'PXAT',
+      timestampInMillis,
+      'NX'
+    );
     expect(setResult2).toBeNull();
 
     await sleep(3000);

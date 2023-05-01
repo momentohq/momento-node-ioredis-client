@@ -1,37 +1,94 @@
 import EventEmitter from 'stream';
-import {CacheClient, CacheDelete, CacheGet, CacheSet, CacheSetIfNotExists, MomentoErrorCode} from '@gomomento/sdk';
+import {
+  CacheClient,
+  CacheDelete,
+  CacheGet,
+  CacheSet,
+  CacheSetIfNotExists,
+  MomentoErrorCode,
+} from '@gomomento/sdk';
 import {RedisKey} from 'ioredis';
 
 export interface MomentoIORedis {
-
   get(key: RedisKey): Promise<string | null>;
 
   set(key: RedisKey, value: string | Buffer | number): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, secondsToken: 'EX', seconds: number | string): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    secondsToken: 'EX',
+    seconds: number | string
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, millisecondsToken: 'PX', milliseconds: number | string): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    millisecondsToken: 'PX',
+    milliseconds: number | string
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, unixTimeSecondsToken: 'EXAT', unixTimeSeconds: number | string): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeSecondsToken: 'EXAT',
+    unixTimeSeconds: number | string
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, unixTimeMillisecondsToken: 'PXAT', unixTimeMilliseconds: number | string): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeMillisecondsToken: 'PXAT',
+    unixTimeMilliseconds: number | string
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, nx: 'NX'): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, secondsToken: 'EX', seconds: number | string, nx: 'NX'): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    secondsToken: 'EX',
+    seconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, millisecondsToken: 'PX', milliseconds: number | string, nx: 'NX'): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    millisecondsToken: 'PX',
+    milliseconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, unixTimeSecondsToken: 'EXAT', unixTimeSeconds: number | string, nx: 'NX'): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeSecondsToken: 'EXAT',
+    unixTimeSeconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
 
-  set(key: RedisKey, value: string | Buffer | number, unixTimeMillisecondsToken: 'PXAT', unixTimeMilliseconds: number | string, nx: 'NX'): Promise<'OK' | null>;
+  set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeMillisecondsToken: 'PXAT',
+    unixTimeMilliseconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
 
   del(...args: [...keys: RedisKey[]]): Promise<number>;
 
   quit(): Promise<'OK'>;
 }
 
-export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis {
+export class MomentoRedisAdapter
+  extends EventEmitter
+  implements MomentoIORedis
+{
   momentoClient: CacheClient;
   cacheName: string;
 
@@ -43,18 +100,17 @@ export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis 
 
   async del(...args: [...keys: RedisKey[]]): Promise<number> {
     const promises: Array<Promise<CacheDelete.Response>> = [];
-    args.forEach((value) => {
+    args.forEach(value => {
       promises.push(this.momentoClient.delete(this.cacheName, value));
     });
     const deleteResponses = await Promise.all(promises);
-    deleteResponses.forEach((r) => {
+    deleteResponses.forEach(r => {
       if (r instanceof CacheDelete.Error) {
         this.emitError('del', r.message(), r.errorCode());
       }
     });
     return promises.length;
   }
-
 
   async get(key: RedisKey): Promise<string | null> {
     const rsp = await this.momentoClient.get(this.cacheName, key);
@@ -75,7 +131,7 @@ export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis 
     return 'OK';
   }
 
-  emitError(op: String, msg: String, code?: MomentoErrorCode) {
+  emitError(op: string, msg: string, code?: MomentoErrorCode) {
     this.emit('error', {
       platform: this.momentoClient !== undefined ? 'momento' : 'redis',
       op: op,
@@ -84,17 +140,74 @@ export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis 
     });
   }
 
-  async set(key: RedisKey, value: string | Buffer | number): Promise<'OK' | null>;
-  async set(key: RedisKey, value: string | Buffer | number, secondsToken: 'EX', seconds: number | string): Promise<'OK' | null>;
-  async set(key: RedisKey, value: string | Buffer | number, millisecondsToken: 'PX', milliseconds: number | string): Promise<'OK' | null>;
-  async set(key: RedisKey, value: string | Buffer | number, unixTimeSecondsToken: 'EXAT', unixTimeSeconds: number | string): Promise<'OK' | null>;
-  async set(key: RedisKey, value: string | Buffer | number, unixTimeMillisecondsToken: 'PXAT', unixTimeMilliseconds: number | string): Promise<'OK' | null>;
-  async set(key: RedisKey, value: string | Buffer | number, nx: 'NX'): Promise<'OK' | null>
-  async set(key: RedisKey, value: string | Buffer | number, secondsToken: 'EX', seconds: number | string, nx: 'NX'): Promise<'OK' | null>
-  async set(key: RedisKey, value: string | Buffer | number, millisecondsToken: 'PX', milliseconds: number | string, nx: 'NX'): Promise<'OK' | null>
-  async set(key: RedisKey, value: string | Buffer | number, unixTimeSecondsToken: 'EXAT', unixTimeSeconds: number | string, nx: 'NX'): Promise<'OK' | null>
-  async set(key: RedisKey, value: string | Buffer | number, unixTimeMillisecondsToken: 'PXAT', unixTimeMilliseconds: number | string, nx: 'NX'): Promise<'OK' | null>
-  async set(key: RedisKey, value: string | Buffer | number, ttlFlagIdentifier?: 'EX' | 'PX' | 'EXAT' | 'PXAT' | 'NX', ttlValue?: number | string, nx?: 'NX'): Promise<'OK' | null> {
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    secondsToken: 'EX',
+    seconds: number | string
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    millisecondsToken: 'PX',
+    milliseconds: number | string
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeSecondsToken: 'EXAT',
+    unixTimeSeconds: number | string
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeMillisecondsToken: 'PXAT',
+    unixTimeMilliseconds: number | string
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    secondsToken: 'EX',
+    seconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    millisecondsToken: 'PX',
+    milliseconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeSecondsToken: 'EXAT',
+    unixTimeSeconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    unixTimeMillisecondsToken: 'PXAT',
+    unixTimeMilliseconds: number | string,
+    nx: 'NX'
+  ): Promise<'OK' | null>;
+  async set(
+    key: RedisKey,
+    value: string | Buffer | number,
+    ttlFlagIdentifier?: 'EX' | 'PX' | 'EXAT' | 'PXAT' | 'NX',
+    ttlValue?: number | string,
+    nx?: 'NX'
+  ): Promise<'OK' | null> {
     let parsedTTl = -1;
     if (ttlValue === undefined) {
       // Do nothing keep as -1 will use default TTL
@@ -127,10 +240,14 @@ export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis 
           value.toString(),
           {
             ttl: parsedTTl,
-          },
+          }
         );
       } else {
-        rsp = await this.momentoClient.setIfNotExists(this.cacheName, key, value.toString());
+        rsp = await this.momentoClient.setIfNotExists(
+          this.cacheName,
+          key,
+          value.toString()
+        );
       }
 
       if (rsp instanceof CacheSetIfNotExists.Stored) {
@@ -151,12 +268,15 @@ export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis 
           value.toString(),
           {
             ttl: parsedTTl,
-          },
+          }
         );
       } else {
-        rsp = await this.momentoClient.set(this.cacheName, key, value.toString());
+        rsp = await this.momentoClient.set(
+          this.cacheName,
+          key,
+          value.toString()
+        );
       }
-
 
       if (rsp instanceof CacheSet.Success) {
         return 'OK';
@@ -169,5 +289,4 @@ export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis 
 
     return null;
   }
-
 }
