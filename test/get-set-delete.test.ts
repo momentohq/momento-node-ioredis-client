@@ -1,30 +1,30 @@
 import {v4} from 'uuid';
-import {sleep} from "@gomomento/sdk/dist/src/internal/utils/sleep";
-import {NewIORedisWrapper} from "../src";
+import {sleep} from '@gomomento/sdk/dist/src/internal/utils/sleep';
+import {NewIORedisWrapper} from '../src';
 
 const client = NewIORedisWrapper([], {});
 
 describe('simple get and set', () => {
   it('happy path set get update delete', async () => {
     // Set initial key value
-    await client.set("mykey", "value1");
+    await client.set('mykey', 'value1');
 
     // Get value
-    let result = await client.get("mykey");
-    expect(result).toEqual("value1");
+    let result = await client.get('mykey');
+    expect(result).toEqual('value1');
 
     // Update value
-    await client.set("mykey", "value2");
+    await client.set('mykey', 'value2');
 
     // Read updated value
-    result = await client.get("mykey");
-    expect(result).toEqual("value2");
+    result = await client.get('mykey');
+    expect(result).toEqual('value2');
     // Delete key
     await client.del('mykey');
 
     // Should get null back now
-    result = await client.get("mykey");
-    expect(result).toBeNull()
+    result = await client.get('mykey');
+    expect(result).toBeNull();
 
     await client.quit();
   });
@@ -48,7 +48,7 @@ describe('get and set with expiration', () => {
   it('should expire a value after a number of seconds', async () => {
     const key = v4();
     const value = v4();
-    const setResult = await client.set(key, value, "EX", 3);
+    const setResult = await client.set(key, value, 'EX', 3);
     expect(setResult).toBe('OK');
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
@@ -62,7 +62,7 @@ describe('get and set with expiration', () => {
   it('should expire a value after a number of milliseconds', async () => {
     const key = v4();
     const value = v4();
-    const setResult = await client.set(key, value, "PX", 3000);
+    const setResult = await client.set(key, value, 'PX', 3000);
     expect(setResult).toBe('OK');
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
@@ -77,7 +77,7 @@ describe('get and set with expiration', () => {
     const key = v4();
     const value = v4();
     const timestamp = Math.floor(Date.now() / 1000) + 3;
-    const setResult = await client.set(key, value, "EXAT", timestamp);
+    const setResult = await client.set(key, value, 'EXAT', timestamp);
     expect(setResult).toBe('OK');
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
@@ -92,7 +92,7 @@ describe('get and set with expiration', () => {
     const key = v4();
     const value = v4();
     const timestamp = Date.now() + 3000;
-    await client.set(key, value, "PXAT", timestamp);
+    await client.set(key, value, 'PXAT', timestamp);
     const result = await client.get(key);
     expect(result).toEqual(value);
 
@@ -107,7 +107,7 @@ describe('get and set with existence conditions', () => {
   it('should set a value if using nx and the key does not exist', async () => {
     const key = v4();
     const value = v4();
-    const setResult = await client.set(key, value, "NX");
+    const setResult = await client.set(key, value, 'NX');
     expect(setResult).toEqual('OK');
   });
 
@@ -116,14 +116,14 @@ describe('get and set with existence conditions', () => {
     const value = v4();
     const setResult = await client.set(key, value);
     expect(setResult).toEqual('OK');
-    const setResult2 = await client.set(key, value, "NX");
+    const setResult2 = await client.set(key, value, 'NX');
     expect(setResult2).toBeNull();
   });
 
   it('should also expire a value if using nx and the key does not exist', async () => {
     const key = v4();
     const value = v4();
-    const setResult = await client.set(key, value, "EX", 3, "NX");
+    const setResult = await client.set(key, value, 'EX', 3, 'NX');
     expect(setResult).toEqual('OK');
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
@@ -139,12 +139,12 @@ describe('get and set with existence conditions', () => {
     const value = v4();
     const timestampInMillis = Date.now() + 3000;
 
-    const setResult = await client.set(key, value, "PXAT", timestampInMillis, "NX")
+    const setResult = await client.set(key, value, 'PXAT', timestampInMillis, 'NX');
     expect(setResult).toEqual('OK');
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    const setResult2 = await client.set(key, value, "PXAT", timestampInMillis, "NX");
+    const setResult2 = await client.set(key, value, 'PXAT', timestampInMillis, 'NX');
     expect(setResult2).toBeNull();
 
     await sleep(3000);
@@ -198,7 +198,7 @@ describe('get, set, and delete', () => {
   it('should return 1 incorrectly when deleting a key that does not exist', async () => {
     const key = v4();
     const deleteResult = await client.del(key);
-      expect(deleteResult).toEqual(1);
+    expect(deleteResult).toEqual(1);
     // }
   });
 });
