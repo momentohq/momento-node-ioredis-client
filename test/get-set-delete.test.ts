@@ -1,8 +1,8 @@
-import {MomentoRedisAdapter} from "../src";
 import {v4} from 'uuid';
 import {sleep} from "@gomomento/sdk/dist/src/internal/utils/sleep";
+import {NewIORedisWrapper} from "../src";
 
-const client = new MomentoRedisAdapter([], {});
+const client = NewIORedisWrapper([], {});
 
 describe('simple get and set', () => {
   it('happy path set get update delete', async () => {

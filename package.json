@@ -129,7 +129,8 @@
       "dist",
       "node_modules",
       "examples",
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "jest*.config.ts"
     ]
   },
   "jest": {
