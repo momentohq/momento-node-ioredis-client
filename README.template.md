@@ -1,3 +1,4 @@
+
 {{ ossHeader }}
 
 # Momento Node.js IORedis compatibility client
@@ -87,7 +88,6 @@ wrapper functions.
 | MOMENTO_AUTH_TOKEN  | The Momento Auth token you would like to use               | ""      |
 | CACHE_NAME          | The name of the Momento Cache to use if Momento is enabled | ""      |
 | DEFAULT_TTL_SECONDS | The number of seconds to cache items for by default        | 86400   |
-
 
 ## Installation
 
