@@ -4,9 +4,9 @@ import {
   Configurations,
   CredentialProvider,
 } from "@gomomento/sdk";
-import {MomentoRedisAdapter} from "./momento-redis-adapter";
+import {MomentoIORedisCluster, MomentoRedisAdapter} from "./momento-redis-adapter";
 
-export function NewIORedisWrapper(startupNodes: ClusterNode[], options?: ClusterOptions) {
+export function NewIORedisWrapper(startupNodes: ClusterNode[], options?: ClusterOptions): MomentoIORedisCluster {
   const authTokenEnvVarName = 'MOMENTO_AUTH_TOKEN',
     enableMomentoVar = process.env["MOMENTO_ENABLED"],
     defaultTTLSecondsVar = process.env["DEFAULT_TTL_SECONDS"],
