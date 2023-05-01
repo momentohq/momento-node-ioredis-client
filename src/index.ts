@@ -1,4 +1,4 @@
-import {NewIORedisWrapper} from './wrap-ioredis';
-import {MomentoIORedisCluster, MomentoRedisAdapter} from './momento-redis-adapter';
+import {NewIORedisWrapper, NewIORedisClusterWrapper} from './wrap-ioredis';
+import {MomentoIORedis, MomentoRedisAdapter} from './momento-redis-adapter';
 
-export {MomentoIORedisCluster, MomentoRedisAdapter, NewIORedisWrapper};
+export {MomentoIORedis, MomentoRedisAdapter, NewIORedisWrapper, NewIORedisClusterWrapper};

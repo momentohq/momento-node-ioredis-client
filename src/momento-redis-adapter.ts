@@ -2,7 +2,7 @@ import EventEmitter from 'stream';
 import {CacheClient, CacheDelete, CacheGet, CacheSet, CacheSetIfNotExists, MomentoErrorCode} from '@gomomento/sdk';
 import {RedisKey} from 'ioredis';
 
-export interface MomentoIORedisCluster {
+export interface MomentoIORedis {
 
   get(key: RedisKey): Promise<string | null>;
 
@@ -31,7 +31,7 @@ export interface MomentoIORedisCluster {
   quit(): Promise<'OK'>;
 }
 
-export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedisCluster {
+export class MomentoRedisAdapter extends EventEmitter implements MomentoIORedis {
   momentoClient: CacheClient;
   cacheName: string;
 

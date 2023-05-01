@@ -1,8 +1,8 @@
+import {NewIORedisClusterWrapper} from '../src/wrap-ioredis';
 import {v4} from 'uuid';
 import {sleep} from '@gomomento/sdk/dist/src/internal/utils/sleep';
-import {NewIORedisWrapper} from '../src';
 
-const client = NewIORedisWrapper([], {});
+const client = NewIORedisClusterWrapper([], {});
 
 describe('simple get and set', () => {
   it('happy path set get update delete', async () => {
