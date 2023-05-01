@@ -77,6 +77,7 @@ const redisClusterClient = NewIORedisClusterWrapper([], {});
 information see the [Current Redis API Support](#current-redis-api-support) section later in this doc.
 
 ### Momento Wrapper Function configuration
+
 In this package we provide wrapper functions that help you configure wether or not to use Momento and how client settings
 should look based off Environment variables. This is to try and make for a simpler drop in experience where you might be
 running Momento or Redis based off the environment or Region. This applies for `NewIORedisWrapper` and `NewIORedisClusterWrapper`
