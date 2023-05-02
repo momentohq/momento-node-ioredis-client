@@ -40,7 +40,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ls -la
           npm ci
           node -v
 
