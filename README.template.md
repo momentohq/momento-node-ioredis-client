@@ -1,4 +1,3 @@
-
 {{ ossHeader }}
 
 # Momento Node.js IORedis compatibility client
@@ -16,7 +15,7 @@ your client object:
 
 <table>
 <tr>
- <td width="50%">With node-redis client</td>
+ <td width="50%">With ioredis client</td>
  <td width="50%">With Momento's Redis compatibility client</td>
 </tr>
 <tr>
@@ -40,7 +39,7 @@ const redis = new Redis.Cluster(['localhost:6379'], {
 
 ```javascript
 // Import the Momento redis compatibility client.
-import {NewIORedisWrapper,NewIORedisClusterWrapper} from '@gomomento-poc/node-ioredis-client';
+import {NewIORedisWrapper, NewIORedisClusterWrapper} from '@gomomento-poc/node-ioredis-client';
 import {
   CacheClient,
   Configurations,
@@ -73,14 +72,17 @@ const redisClusterClient = NewIORedisClusterWrapper([], {});
 </tr>
 </table>
 
-**NOTE**: The Momento `ioredis` implementation currently supports simple key/value pairs (`GET`, `SET`, `DELETE`). We will continue to add support for additional Redis APIs in the future; for more
+**NOTE**: The Momento `ioredis` implementation currently supports simple key/value pairs (`GET`, `SET`, `DELETE`). We
+will continue to add support for additional Redis APIs in the future; for more
 information see the [Current Redis API Support](#current-redis-api-support) section later in this doc.
 
 ### Momento Wrapper Function configuration
 
-In this package we provide wrapper functions that help you configure wether or not to use Momento and how client settings
+In this package we provide wrapper functions that help you configure wether or not to use Momento and how client
+settings
 should look based off Environment variables. This is to try and make for a simpler drop in experience where you might be
-running Momento or Redis based off the environment or Region. This applies for `NewIORedisWrapper` and `NewIORedisClusterWrapper`
+running Momento or Redis based off the environment or Region. This applies for `NewIORedisWrapper`
+and `NewIORedisClusterWrapper`
 wrapper functions.
 
 | EnvVar Name         | Description                                                | Default |
@@ -92,7 +94,8 @@ wrapper functions.
 
 ## Installation
 
-The Momento Node.js Redis compatibility client is [available on npm.js](https://www.npmjs.com/package/@gomomento-poc/node-redis-client).
+The Momento Node.js IORedis compatibility client
+is [available on npm.js](https://www.npmjs.com/package/@gomomento-poc/node-ioredis-client).
 You can install it via:
 
 ```bash
@@ -101,9 +104,11 @@ npm install @gomomento-poc/node-ioredis-client
 
 ## Current Redis API Support
 
-This library supports the most popular Redis APIs, but does not yet support all Redis APIs. We currently support the most
+This library supports the most popular Redis APIs, but does not yet support all Redis APIs. We currently support the
+most
 common APIs related to string values (GET, SET, DELETE). We will be adding support for additional
-APIs in the future. If there is a particular API that you need support for, please drop by our [Discord](https://discord.com/invite/3HkAKjUZGq)
+APIs in the future. If there is a particular API that you need support for, please drop by
+our [Discord](https://discord.com/invite/3HkAKjUZGq)
 or e-mail us at [support@momentohq.com](mailto:support@momentohq.com) and let us know!
 
 {{ ossFooter }}
