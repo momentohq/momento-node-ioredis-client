@@ -1,8 +1,8 @@
+import {NewIORedisClusterWrapper} from '../src';
 import {v4} from 'uuid';
-import {sleep} from '@gomomento/sdk/dist/src/internal/utils/sleep';
-import {NewIORedisWrapper} from '../src';
+import {sleep} from './utils';
 
-const client = NewIORedisWrapper([], {});
+const client = NewIORedisClusterWrapper([], {});
 
 describe('simple get and set', () => {
   it('happy path set get update delete', async () => {
@@ -44,7 +44,6 @@ describe('simple get and set', () => {
   });
 });
 describe('get and set with expiration', () => {
-
   it('should expire a value after a number of seconds', async () => {
     const key = v4();
     const value = v4();
@@ -53,7 +52,7 @@ describe('get and set with expiration', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -67,7 +66,7 @@ describe('get and set with expiration', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -82,7 +81,7 @@ describe('get and set with expiration', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -96,7 +95,7 @@ describe('get and set with expiration', () => {
     const result = await client.get(key);
     expect(result).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const result2 = await client.get(key);
     expect(result2).toBeNull();
@@ -128,7 +127,7 @@ describe('get and set with existence conditions', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -139,15 +138,27 @@ describe('get and set with existence conditions', () => {
     const value = v4();
     const timestampInMillis = Date.now() + 3000;
 
-    const setResult = await client.set(key, value, 'PXAT', timestampInMillis, 'NX');
+    const setResult = await client.set(
+      key,
+      value,
+      'PXAT',
+      timestampInMillis,
+      'NX'
+    );
     expect(setResult).toEqual('OK');
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    const setResult2 = await client.set(key, value, 'PXAT', timestampInMillis, 'NX');
+    const setResult2 = await client.set(
+      key,
+      value,
+      'PXAT',
+      timestampInMillis,
+      'NX'
+    );
     expect(setResult2).toBeNull();
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();

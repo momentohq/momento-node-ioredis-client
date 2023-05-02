@@ -19,11 +19,11 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@gomomento/sdk": "^1.8.3",
-    "ioredis": "^5.3.2",
-    "typescript": "^5.0.4"
+    "@gomomento/sdk": "1.12.16",
+    "ioredis": "^5.3.2"
   },
   "devDependencies": {
+    "typescript": "5.0.4",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
     "@types/uuid": "^9.0.1",
@@ -111,6 +111,7 @@
         }
       ],
       "require-await": "error",
+      "@typescript-eslint/require-await": "error",
       "import/no-duplicates": "error"
     },
     "settings": {
