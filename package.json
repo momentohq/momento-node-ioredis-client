@@ -110,8 +110,8 @@
           "property": "only"
         }
       ],
-      "require-await": "warn",
-      "@typescript-eslint/require-await": "warn",
+      "require-await": "error",
+      "@typescript-eslint/require-await": "error",
       "import/no-duplicates": "error"
     },
     "settings": {

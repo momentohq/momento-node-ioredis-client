@@ -126,8 +126,9 @@ export class MomentoRedisAdapter
     return null;
   }
 
+  // eslint-disable-next-line require-await, @typescript-eslint/require-await
   async quit(): Promise<'OK'> {
-    // Noop for now. TODO shut down momento client gracefully
+    // @ Noop for now.
     return 'OK';
   }
 
