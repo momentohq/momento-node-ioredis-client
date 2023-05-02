@@ -22,7 +22,7 @@ your client object:
  <td width="50%" valign="top">
 
 ```javascript
-// Import the redis module
+// Import the ioredis module
 const Redis = require('ioredis');
 
 // Create a Redis instance.
@@ -46,7 +46,7 @@ import {
   CredentialProvider,
 } from '@gomomento/sdk';
 
-// Instatiate Momento Adapter Directly
+// Instantiate Momento Adapter Directly
 const Redis = new MomentoRedisAdapter(
   new CacheClient({
     configuration: Configurations.Laptop.v1(),
@@ -65,7 +65,6 @@ const redisClient = NewIORedisWrapper();
 
 // Or Initilize Momento as you would a `ioredis cluster client
 const redisClusterClient = NewIORedisClusterWrapper([], {});
-
 ```
 
  </td>
