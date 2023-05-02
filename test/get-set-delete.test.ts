@@ -1,6 +1,6 @@
-import {NewIORedisClusterWrapper} from '../src/wrap-ioredis';
+import {NewIORedisClusterWrapper} from '../src';
 import {v4} from 'uuid';
-import {sleep} from '@gomomento/sdk/dist/src/internal/utils/sleep';
+import {sleep} from './utils';
 
 const client = NewIORedisClusterWrapper([], {});
 
@@ -52,7 +52,7 @@ describe('get and set with expiration', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -66,7 +66,7 @@ describe('get and set with expiration', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -81,7 +81,7 @@ describe('get and set with expiration', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -95,7 +95,7 @@ describe('get and set with expiration', () => {
     const result = await client.get(key);
     expect(result).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const result2 = await client.get(key);
     expect(result2).toBeNull();
@@ -127,7 +127,7 @@ describe('get and set with existence conditions', () => {
     const getResult = await client.get(key);
     expect(getResult).toEqual(value);
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
@@ -158,7 +158,7 @@ describe('get and set with existence conditions', () => {
     );
     expect(setResult2).toBeNull();
 
-    await sleep(3000);
+    await sleep(3);
 
     const getResult2 = await client.get(key);
     expect(getResult2).toBeNull();
