@@ -14,7 +14,8 @@
     "watch": "tsc -w",
     "build": "rm -rf dist && tsc",
     "test": "npm run test-momento",
-    "test-momento": "CACHE_NAME=default-cache DEFAULT_TTL_SECONDS=60 MOMENTO_ENABLED=true jest"
+    "test-momento": "DEFAULT_TTL_SECONDS=60 MOMENTO_ENABLED=true jest",
+    "test-redis": "MOMENTO_ENABLED=false jest"
   },
   "author": "",
   "license": "Apache-2.0",

@@ -1,8 +1,8 @@
-import {NewIORedisClusterWrapper} from '../src';
 import {v4} from 'uuid';
 import {sleep} from './utils';
+import {SetupIntegrationTest} from './integration-setup';
 
-const client = NewIORedisClusterWrapper([], {});
+const {client} = SetupIntegrationTest();
 
 describe('simple get and set', () => {
   it('happy path set get update delete', async () => {
@@ -25,8 +25,6 @@ describe('simple get and set', () => {
     // Should get null back now
     result = await client.get('mykey');
     expect(result).toBeNull();
-
-    await client.quit();
   });
   it('should be null on a cache miss', async () => {
     const key = v4();
@@ -209,7 +207,10 @@ describe('get, set, and delete', () => {
   it('should return 1 incorrectly when deleting a key that does not exist', async () => {
     const key = v4();
     const deleteResult = await client.del(key);
-    expect(deleteResult).toEqual(1);
-    // }
+    if (process.env.MOMENTO_ENABLED === 'true') {
+      expect(deleteResult).toEqual(1);
+    } else {
+      expect(deleteResult).toEqual(0);
+    }
   });
 });
