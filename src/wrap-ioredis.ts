@@ -1,4 +1,4 @@
-import Redis, {ClusterNode, ClusterOptions, Redis as R} from 'ioredis';
+import Redis, {ClusterNode, ClusterOptions, Redis as R, RedisOptions} from 'ioredis';
 import {CacheClient, Configurations, CredentialProvider} from '@gomomento/sdk';
 import {MomentoIORedis, MomentoRedisAdapter} from './momento-redis-adapter';
 
@@ -38,7 +38,7 @@ function parseConfig(): config {
   };
 }
 
-export function NewIORedisWrapper(): MomentoIORedis {
+export function NewIORedisWrapper(options?: RedisOptions): MomentoIORedis {
   const config = parseConfig();
   if (config.momentoEnabled) {
     return new MomentoRedisAdapter(
