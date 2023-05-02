@@ -72,7 +72,10 @@ function setupIntegrationTestWithMomento() {
   });
 
   const momentoClient = momentoClientForTesting();
-  const momentoNodeRedisClient = new MomentoRedisAdapter(momentoClient, cacheName);
+  const momentoNodeRedisClient = new MomentoRedisAdapter(
+    momentoClient,
+    cacheName
+  );
 
   return {client: momentoNodeRedisClient};
 }
@@ -80,10 +83,10 @@ function setupIntegrationTestWithMomento() {
 function setupIntegrationTestWithRedis() {
   const client = NewIORedisWrapper({
     host: process.env.TEST_REDIS_HOST || 'localhost',
-    port: process.env.TEST_REDIS_PORT ? Number(process.env.TEST_REDIS_PORT) : 6379,
+    port: process.env.TEST_REDIS_PORT
+      ? Number(process.env.TEST_REDIS_PORT)
+      : 6379,
   });
-
-  beforeAll(async () => {});
 
   afterAll(async () => {
     await client.quit();

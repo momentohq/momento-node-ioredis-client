@@ -207,9 +207,9 @@ describe('get, set, and delete', () => {
   it('should return 1 incorrectly when deleting a key that does not exist', async () => {
     const key = v4();
     const deleteResult = await client.del(key);
-    if(process.env.MOMENTO_ENABLED === 'true'){
+    if (process.env.MOMENTO_ENABLED === 'true') {
       expect(deleteResult).toEqual(1);
-    }else{
+    } else {
       expect(deleteResult).toEqual(0);
     }
   });
