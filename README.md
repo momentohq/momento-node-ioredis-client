@@ -43,7 +43,12 @@ const redis = new Redis.Cluster(['localhost:6379'], {
 
 ```javascript
 // Import the Momento redis compatibility client.
-import {NewIORedisWrapper, NewIORedisClusterWrapper} from '@gomomento-poc/node-ioredis-client';
+import {
+  MomentoRedisAdapter,
+  NewIORedisWrapper,
+  NewIORedisClusterWrapper,
+} from '@gomomento-poc/node-ioredis-client';
+
 import {
   CacheClient,
   Configurations,
@@ -55,9 +60,9 @@ const Redis = new MomentoRedisAdapter(
   new CacheClient({
     configuration: Configurations.Laptop.v1(),
     credentialProvider: CredentialProvider.fromEnvironmentVariable({
-      environmentVariableName: authTokenEnvVarName,
+      environmentVariableName: 'MOMENTO_AUTH_TOKEN',
     }),
-    defaultTtlSeconds: config.defaultTTLSeconds,
+    defaultTtlSeconds: 3600,
   }),
   config.cacheName,
 );
