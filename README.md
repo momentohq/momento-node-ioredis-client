@@ -72,7 +72,7 @@ const Redis = new MomentoRedisAdapter(
 // Initialize basic Redis client Momento wrapper
 const redisClient = NewIORedisWrapper();
 
-// Or Initilize Momento as you would a `ioredis cluster client
+// Or initialize Momento as you would an `ioredis cluster client.
 const redisClusterClient = NewIORedisClusterWrapper([], {});
 ```
 
