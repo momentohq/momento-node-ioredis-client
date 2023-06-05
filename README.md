@@ -62,7 +62,7 @@ const Redis = new MomentoRedisAdapter(
   config.cacheName,
 );
 
-// Or use Momento wrapper functions to provide a more drop in friendly replacement when trying to toggle between Momento and Redis.
+// Or use Momento wrapper functions to provide a more drop-in friendly replacement when trying to toggle between Momento and Redis.
 // Use env vars to configure Momento. See Momento wrapper function configuration section.
 // Initialize basic Redis client Momento wrapper
 const redisClient = NewIORedisWrapper();
