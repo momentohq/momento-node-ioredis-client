@@ -8,8 +8,8 @@ describe('ttl', () => {
     const key = v4();
     const value = v4();
 
-    // Set initial key value with a 3 seconds expiration
-    await client.set(key, value, 'EX', 3);
+    // Set initial key value with a 5 seconds expiration
+    await client.set(key, value, 'EX', 5);
 
     // Get ttl of key
     const ttlResp = await client.ttl(key);
@@ -20,8 +20,8 @@ describe('ttl', () => {
     const key = v4();
     const value = v4();
 
-    // Set initial key value with a 3000 milliseconds expiration
-    await client.set(key, value, 'EX', 3);
+    // Set initial key value with a 5000 milliseconds expiration
+    await client.set(key, value, 'EX', 5);
 
     // Get ttl of key
     const pttlResp = await client.pttl(key);
