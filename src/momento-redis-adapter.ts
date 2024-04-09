@@ -471,6 +471,7 @@ export class MomentoRedisAdapter
       this.emitError('hdel', 'unexpected-response ' + typeof rsp);
       return 0;
     }
+  }
 
   async ttl(key: RedisKey): Promise<number | null> {
     const rsp = await this.momentoClient.itemGetTtl(this.cacheName, key);
