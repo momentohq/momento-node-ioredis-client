@@ -6,6 +6,7 @@ import {
   CacheItemGetTtl,
   CacheSet,
   CacheSetIfAbsent,
+  CacheUpdateTtl,
   MomentoErrorCode,
 } from '@gomomento/sdk';
 import {RedisKey} from 'ioredis';
@@ -84,6 +85,32 @@ export interface MomentoIORedis {
   ttl(key: RedisKey): Promise<number | null>;
 
   pttl(key: RedisKey): Promise<number | null>;
+
+  pexpire(key: RedisKey, milliseconds: number): Promise<number | null>;
+
+  pexpire(
+    key: RedisKey,
+    milliseconds: number,
+    nx: 'NX'
+  ): Promise<number | null>;
+
+  pexpire(
+    key: RedisKey,
+    milliseconds: number,
+    xx: 'XX'
+  ): Promise<number | null>;
+
+  pexpire(
+    key: RedisKey,
+    milliseconds: number,
+    gt: 'GT'
+  ): Promise<number | null>;
+
+  pexpire(
+    key: RedisKey,
+    milliseconds: number,
+    lt: 'LT'
+  ): Promise<number | null>;
 
   del(...args: [...keys: RedisKey[]]): Promise<number>;
 
@@ -328,5 +355,55 @@ export class MomentoRedisAdapter
       this.emitError('ttl', 'unexpected-response');
     }
     return null;
+  }
+
+  async pexpire(
+    key: RedisKey,
+    milliseconds: number,
+    ttlFlagIdentifier?: 'NX' | 'XX' | 'GT' | 'LT'
+  ): Promise<number | null> {
+    let shouldUpdateTtl = true;
+
+    if (ttlFlagIdentifier === 'NX') {
+      return 0;
+    } else if (ttlFlagIdentifier === 'XX') {
+      const getTtlRsp = await this.momentoClient.itemGetTtl(
+        this.cacheName,
+        key
+      );
+      shouldUpdateTtl =
+        getTtlRsp instanceof CacheItemGetTtl.Hit &&
+        getTtlRsp.remainingTtlMillis() > 0;
+    } else if (ttlFlagIdentifier === 'GT' || ttlFlagIdentifier === 'LT') {
+      const getTtlRsp = await this.momentoClient.itemGetTtl(
+        this.cacheName,
+        key
+      );
+      shouldUpdateTtl =
+        getTtlRsp instanceof CacheItemGetTtl.Hit &&
+        (ttlFlagIdentifier === 'GT'
+          ? getTtlRsp.remainingTtlMillis() < milliseconds
+          : getTtlRsp.remainingTtlMillis() > milliseconds);
+    }
+
+    if (shouldUpdateTtl) {
+      const rsp = await this.momentoClient.updateTtl(
+        this.cacheName,
+        key,
+        milliseconds
+      );
+
+      if (rsp instanceof CacheUpdateTtl.Set) {
+        return 1;
+      } else if (rsp instanceof CacheUpdateTtl.Miss) {
+        return 0;
+      } else if (rsp instanceof CacheUpdateTtl.Error) {
+        this.emitError('pexpire', rsp.message(), rsp.errorCode());
+      } else {
+        this.emitError('pexpire', 'unexpected-response');
+      }
+    }
+
+    return 0;
   }
 }
