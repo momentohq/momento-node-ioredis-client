@@ -23,34 +23,34 @@ export interface MomentoIORedis {
     key: RedisKey,
     value: string | Buffer | number,
     secondsToken: 'EX',
-    seconds: number | string,
+    seconds: number | string
   ): Promise<'OK' | null>;
 
   set(
     key: RedisKey,
     value: string | Buffer | number,
     millisecondsToken: 'PX',
-    milliseconds: number | string,
+    milliseconds: number | string
   ): Promise<'OK' | null>;
 
   set(
     key: RedisKey,
     value: string | Buffer | number,
     unixTimeSecondsToken: 'EXAT',
-    unixTimeSeconds: number | string,
+    unixTimeSeconds: number | string
   ): Promise<'OK' | null>;
 
   set(
     key: RedisKey,
     value: string | Buffer | number,
     unixTimeMillisecondsToken: 'PXAT',
-    unixTimeMilliseconds: number | string,
+    unixTimeMilliseconds: number | string
   ): Promise<'OK' | null>;
 
   set(
     key: RedisKey,
     value: string | Buffer | number,
-    nx: 'NX',
+    nx: 'NX'
   ): Promise<'OK' | null>;
 
   set(
@@ -58,7 +58,7 @@ export interface MomentoIORedis {
     value: string | Buffer | number,
     secondsToken: 'EX',
     seconds: number | string,
-    nx: 'NX',
+    nx: 'NX'
   ): Promise<'OK' | null>;
 
   set(
@@ -66,7 +66,7 @@ export interface MomentoIORedis {
     value: string | Buffer | number,
     millisecondsToken: 'PX',
     milliseconds: number | string,
-    nx: 'NX',
+    nx: 'NX'
   ): Promise<'OK' | null>;
 
   set(
@@ -74,7 +74,7 @@ export interface MomentoIORedis {
     value: string | Buffer | number,
     unixTimeSecondsToken: 'EXAT',
     unixTimeSeconds: number | string,
-    nx: 'NX',
+    nx: 'NX'
   ): Promise<'OK' | null>;
 
   set(
@@ -82,35 +82,35 @@ export interface MomentoIORedis {
     value: string | Buffer | number,
     unixTimeMillisecondsToken: 'PXAT',
     unixTimeMilliseconds: number | string,
-    nx: 'NX',
+    nx: 'NX'
   ): Promise<'OK' | null>;
 
   del(...args: [...keys: RedisKey[]]): Promise<number>;
 
   hget(
     key: RedisKey,
-    field: string | Buffer,
+    field: string | Buffer
   ): Promise<string | null>;
 
   hmget(
     ...args: [
       key: RedisKey,
-      ...fields: (string | Buffer)[],
+      ...fields: (string | Buffer)[]
     ]
   ): Promise<(string | null)[]>;
 
   hgetall(
-    key: RedisKey,
+    key: RedisKey
   ): Promise<Record<string, string>>;
 
   hset(
     key: RedisKey,
-    object: object,
+    object: object
   ): Promise<number>;
 
   hset(
     key: RedisKey,
-    map: Map<string | Buffer | number, string | Buffer | number>,
+    map: Map<string | Buffer | number, string | Buffer | number>
   ): Promise<number>;
 
   hset(
@@ -119,18 +119,18 @@ export interface MomentoIORedis {
 
   hmset(
     key: RedisKey,
-    object: object,
+    object: object
   ): Promise<'OK'>;
 
   hmset(
     key: RedisKey,
-    map: Map<string | Buffer | number, string | Buffer | number>,
+    map: Map<string | Buffer | number, string | Buffer | number>
   ): Promise<'OK'>;
 
   hmset(
     ...args: [
       key: RedisKey,
-      ...fieldValues: (string | Buffer | number)[],
+      ...fieldValues: (string | Buffer | number)[]
     ]
   ): Promise<'OK'>;
 
