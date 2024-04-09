@@ -342,22 +342,29 @@ export class MomentoRedisAdapter
   }
 
   async hset(
-    arg1:
-      | [key: RedisKey, ...fieldValues: (string | Buffer | number)[]]
-      | RedisKey,
-    arg2: Map<string | Buffer | number, string | Buffer | number> | object
+    ...args: [
+      RedisKey,
+      (
+        | object
+        | Map<string | Buffer | number, string | Buffer | number>
+        | string
+        | Buffer
+        | number
+      ),
+      ...Array<string | Buffer | number>
+    ]
   ): Promise<number> {
     let fieldsToSet: Map<string | Uint8Array, string | Uint8Array> = new Map();
     let dictionaryName = '';
-    if (arg1 instanceof String || arg1 instanceof Buffer) {
-      dictionaryName = String(arg1);
+    if (args[0] instanceof String) {
+      dictionaryName = String(args[0]);
       fieldsToSet = new Map<string | Uint8Array, string | Uint8Array>(
-        Object.entries(arg2)
+        Object.entries(args[1])
       );
     } else {
-      dictionaryName = String(arg1[0]);
-      for (let i = 1; i < arg1.length; i + 2) {
-        fieldsToSet.set(String(arg1[i]), String(arg1[i + 1]));
+      dictionaryName = String(args[0]);
+      for (let i = 1; i < args.length; i + 2) {
+        fieldsToSet.set(String(args[i]), String(args[i + 1]));
       }
     }
 
@@ -379,12 +386,19 @@ export class MomentoRedisAdapter
   }
 
   async hmset(
-    arg1:
-      | [key: RedisKey, ...fieldValues: (string | Buffer | number)[]]
-      | RedisKey,
-    arg2: Map<string | Buffer | number, string | Buffer | number> | object
+    ...args: [
+      RedisKey,
+      (
+        | object
+        | Map<string | Buffer | number, string | Buffer | number>
+        | string
+        | Buffer
+        | number
+      ),
+      ...Array<string | Buffer | number>
+    ]
   ): Promise<'OK'> {
-    await this.hset(arg1, arg2);
+    await this.hset(...args);
     return 'OK';
   }
 
