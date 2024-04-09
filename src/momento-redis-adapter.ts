@@ -4,7 +4,7 @@ import {
   CacheDelete,
   CacheGet,
   CacheSet,
-  CacheSetIfNotExists,
+  CacheSetIfAbsent,
   MomentoErrorCode,
 } from '@gomomento/sdk';
 import {RedisKey} from 'ioredis';
@@ -238,9 +238,9 @@ export class MomentoRedisAdapter
     }
 
     if (nxFlagSet) {
-      let rsp: CacheSetIfNotExists.Response;
+      let rsp: CacheSetIfAbsent.Response;
       if (parsedTTl > -1) {
-        rsp = await this.momentoClient.setIfNotExists(
+        rsp = await this.momentoClient.setIfAbsent(
           this.cacheName,
           key,
           value.toString(),
@@ -249,18 +249,18 @@ export class MomentoRedisAdapter
           }
         );
       } else {
-        rsp = await this.momentoClient.setIfNotExists(
+        rsp = await this.momentoClient.setIfAbsent(
           this.cacheName,
           key,
           value.toString()
         );
       }
 
-      if (rsp instanceof CacheSetIfNotExists.Stored) {
+      if (rsp instanceof CacheSetIfAbsent.Stored) {
         return 'OK';
-      } else if (rsp instanceof CacheSetIfNotExists.NotStored) {
+      } else if (rsp instanceof CacheSetIfAbsent.NotStored) {
         return null;
-      } else if (rsp instanceof CacheSetIfNotExists.Error) {
+      } else if (rsp instanceof CacheSetIfAbsent.Error) {
         this.emitError('set-not-exists', rsp.message(), rsp.errorCode());
       } else {
         this.emitError('set-not-exists', 'unexpected-response');
