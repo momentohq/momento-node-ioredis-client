@@ -8,6 +8,7 @@ import {
   CacheDictionaryRemoveFields,
   CacheDictionarySetFields,
   CacheGet,
+  CacheItemGetTtl,
   CacheSet,
   CacheSetIfAbsent,
   MomentoErrorCode,
@@ -84,6 +85,10 @@ export interface MomentoIORedis {
     unixTimeMilliseconds: number | string,
     nx: 'NX'
   ): Promise<'OK' | null>;
+
+  ttl(key: RedisKey): Promise<number | null>;
+
+  pttl(key: RedisKey): Promise<number | null>;
 
   del(...args: [...keys: RedisKey[]]): Promise<number>;
 
@@ -466,5 +471,32 @@ export class MomentoRedisAdapter
       this.emitError('hdel', 'unexpected-response ' + typeof rsp);
       return 0;
     }
+
+  async ttl(key: RedisKey): Promise<number | null> {
+    const rsp = await this.momentoClient.itemGetTtl(this.cacheName, key);
+    if (rsp instanceof CacheItemGetTtl.Hit) {
+      return rsp.remainingTtlMillis() / 1000;
+    } else if (rsp instanceof CacheItemGetTtl.Miss) {
+      return null;
+    } else if (rsp instanceof CacheItemGetTtl.Error) {
+      this.emitError('ttl', rsp.message(), rsp.errorCode());
+    } else {
+      this.emitError('ttl', 'unexpected-response');
+    }
+    return null;
+  }
+
+  async pttl(key: RedisKey): Promise<number | null> {
+    const rsp = await this.momentoClient.itemGetTtl(this.cacheName, key);
+    if (rsp instanceof CacheItemGetTtl.Hit) {
+      return rsp.remainingTtlMillis();
+    } else if (rsp instanceof CacheItemGetTtl.Miss) {
+      return null;
+    } else if (rsp instanceof CacheItemGetTtl.Error) {
+      this.emitError('ttl', rsp.message(), rsp.errorCode());
+    } else {
+      this.emitError('ttl', 'unexpected-response');
+    }
+    return null;
   }
 }
