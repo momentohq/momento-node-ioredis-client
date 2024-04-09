@@ -6,24 +6,27 @@ const {client} = SetupIntegrationTest();
 
 describe('simple get and set', () => {
   it('happy path set get update delete', async () => {
+    const key = v4();
+    const value1 = v4();
+    const value2 = v4();
     // Set initial key value
-    await client.set('mykey', 'value1');
+    await client.set(key, value1);
 
     // Get value
-    let result = await client.get('mykey');
-    expect(result).toEqual('value1');
+    let result = await client.get(key);
+    expect(result).toEqual(value1);
 
     // Update value
-    await client.set('mykey', 'value2');
+    await client.set(key, value2);
 
     // Read updated value
-    result = await client.get('mykey');
-    expect(result).toEqual('value2');
+    result = await client.get(key);
+    expect(result).toEqual(value2);
     // Delete key
-    await client.del('mykey');
+    await client.del(key);
 
     // Should get null back now
-    result = await client.get('mykey');
+    result = await client.get(key);
     expect(result).toBeNull();
   });
   it('should be null on a cache miss', async () => {
