@@ -22,11 +22,13 @@ jobs:
     strategy:
       matrix:
         node: [16, 18, 19]
+        compression: [true, false]
     name: Test on Node ${{ matrix.node }}
     runs-on: macos-latest
     env:
       MOMENTO_AUTH_TOKEN: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
       CACHE_NAME: js-io-redis-client-test-ci
+      COMPRESSION: ${{ matrix.compression }}
 
     steps:
       - name: Setup repo

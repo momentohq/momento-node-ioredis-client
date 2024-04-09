@@ -91,11 +91,14 @@ export class MomentoRedisAdapter
 {
   momentoClient: CacheClient;
   cacheName: string;
+  useCompression: boolean;
 
   constructor(momentoClient: CacheClient, cacheName: string) {
     super();
     this.momentoClient = momentoClient;
     this.cacheName = cacheName;
+
+    this.useCompression = momentoClient.configuration.hasCompressionStrategy();
   }
 
   async del(...args: [...keys: RedisKey[]]): Promise<number> {
@@ -113,7 +116,9 @@ export class MomentoRedisAdapter
   }
 
   async get(key: RedisKey): Promise<string | null> {
-    const rsp = await this.momentoClient.get(this.cacheName, key);
+    const rsp = await this.momentoClient.get(this.cacheName, key, {
+      decompress: this.useCompression,
+    });
     if (rsp instanceof CacheGet.Hit) {
       return rsp.valueString();
     } else if (rsp instanceof CacheGet.Miss) {
@@ -275,7 +280,8 @@ export class MomentoRedisAdapter
         rsp = await this.momentoClient.set(
           this.cacheName,
           key,
-          value.toString()
+          value.toString(),
+          {compress: this.useCompression}
         );
       }
 
