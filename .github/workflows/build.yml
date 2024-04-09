@@ -21,7 +21,7 @@ jobs:
   test-momento:
     strategy:
       matrix:
-        node: [16, 18, 19]
+        node: [16, 18, 20]
         compression: [true, false]
     name: Test on Node ${{ matrix.node }}
     runs-on: macos-latest
@@ -61,7 +61,7 @@ jobs:
       # TODO the redis tests are flaky when run all in parallel.
       max-parallel: 2
       matrix:
-        node: [16, 18, 19]
+        node: [16, 18, 20]
     name: Test on Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     services:
