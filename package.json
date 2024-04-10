@@ -20,11 +20,11 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@gomomento/sdk": "1.12.16",
+    "@gomomento/sdk": "^1.75.0",
     "ioredis": "^5.3.2"
   },
   "devDependencies": {
-    "typescript": "5.0.4",
+    "@gomomento/sdk-nodejs-compression": "^0.75.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
     "@types/uuid": "^9.0.1",
@@ -41,6 +41,7 @@
     "jest-extended": "^3.2.4",
     "prettier": "^2.4.1",
     "ts-jest": "^29.0.5",
+    "typescript": "5.0.4",
     "uuid": "^9.0.0"
   },
   "eslintConfig": {
@@ -112,7 +113,6 @@
         }
       ],
       "require-await": "error",
-      "@typescript-eslint/require-await": "error",
       "import/no-duplicates": "error"
     },
     "settings": {
@@ -131,8 +131,7 @@
       "dist",
       "node_modules",
       "examples",
-      "**/*.d.ts",
-      "jest*.config.ts"
+      "**/*.d.ts"
     ]
   },
   "jest": {

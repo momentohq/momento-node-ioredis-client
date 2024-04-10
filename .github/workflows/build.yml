@@ -21,12 +21,14 @@ jobs:
   test-momento:
     strategy:
       matrix:
-        node: [16, 18, 19]
+        node: [16, 18, 20]
+        compression: [true, false]
     name: Test on Node ${{ matrix.node }}
     runs-on: macos-latest
     env:
       MOMENTO_AUTH_TOKEN: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
       CACHE_NAME: js-io-redis-client-test-ci
+      COMPRESSION: ${{ matrix.compression }}
 
     steps:
       - name: Setup repo
@@ -59,7 +61,7 @@ jobs:
       # TODO the redis tests are flaky when run all in parallel.
       max-parallel: 2
       matrix:
-        node: [16, 18, 19]
+        node: [16, 18, 20]
     name: Test on Node ${{ matrix.node }}
     runs-on: ubuntu-latest
     services:

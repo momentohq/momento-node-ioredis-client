@@ -7,12 +7,19 @@ import {
   MomentoErrorCode,
   CacheClient,
   CredentialProvider,
+  CacheConfiguration,
+  Configuration,
 } from '@gomomento/sdk';
+import {CompressorFactory} from '@gomomento/sdk-nodejs-compression';
 import {MomentoIORedis, MomentoRedisAdapter, NewIORedisWrapper} from '../src';
 
 export function testCacheName(): string {
   const name = process.env.CACHE_NAME || 'js-integration-test-default';
   return name + v4();
+}
+
+function useCompression(): boolean {
+  return process.env.COMPRESSION === 'true';
 }
 
 const deleteCacheIfExists = async (momento: CacheClient, cacheName: string) => {
@@ -25,8 +32,15 @@ const deleteCacheIfExists = async (momento: CacheClient, cacheName: string) => {
 };
 
 function momentoClientForTesting() {
+  let configuration: CacheConfiguration | Configuration =
+    Configurations.Laptop.latest();
+  if (useCompression()) {
+    configuration = configuration.withCompressionStrategy({
+      compressorFactory: CompressorFactory.default(),
+    });
+  }
   const IntegrationTestCacheClientProps: CacheClientProps = {
-    configuration: Configurations.Laptop.latest(),
+    configuration,
     credentialProvider: CredentialProvider.fromEnvironmentVariable({
       environmentVariableName: 'MOMENTO_AUTH_TOKEN',
     }),
