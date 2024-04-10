@@ -355,15 +355,20 @@ export class MomentoRedisAdapter
     ]
   ): Promise<number> {
     let fieldsToSet: Map<string | Uint8Array, string | Uint8Array> = new Map();
-    let dictionaryName = '';
-    if (args[0] instanceof String) {
-      dictionaryName = String(args[0]);
-      fieldsToSet = new Map<string | Uint8Array, string | Uint8Array>(
-        Object.entries(args[1])
-      );
+    let dictionaryName = String(args[0]);
+    if (typeof args[1] === 'object') {
+      if (args[1] instanceof Map) {
+        for (const [key, value] of args[1]) {
+          fieldsToSet.set(String(key), String(value))
+        }
+      } else {
+        dictionaryName = String(args[0]);
+        fieldsToSet = new Map<string | Uint8Array, string | Uint8Array>(
+          Object.entries(args[1]),
+        );
+      }
     } else {
-      dictionaryName = String(args[0]);
-      for (let i = 1; i < args.length; i + 2) {
+      for (let i = 1; i < args.length; i += 2) {
         fieldsToSet.set(String(args[i]), String(args[i + 1]));
       }
     }
