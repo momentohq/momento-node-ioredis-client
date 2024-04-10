@@ -26,7 +26,7 @@ describe('hash', () => {
     const field = v4();
     const value = v4();
     const result = await client.hmset(key, field, value);
-    expect(result).toBe("OK");
+    expect(result).toBe('OK');
 
     const getAllResult = await client.hgetall(key);
     expect(getAllResult).toEqual({[field]: value});
@@ -50,9 +50,7 @@ describe('hash', () => {
     const result = await client.hset(key, field, value);
     expect(result).toBe(1);
 
-    const getResult = await client.hgetall(
-      key
-    );
+    const getResult = await client.hgetall(key);
     expect(getResult).toEqual({[field]: String(value)});
   });
 
@@ -63,9 +61,7 @@ describe('hash', () => {
     const result = await client.hset(key, field, value);
     expect(result).toBe(1);
 
-    const getResult = await client.hgetall(
-      key
-    );
+    const getResult = await client.hgetall(key);
     expect(getResult).toEqual({[field]: String(value)});
   });
 
@@ -103,6 +99,7 @@ describe('hash', () => {
     expect(result).toBe(2);
 
     const getResult = await client.hgetall(key);
+    // eslint-disable-next-line node/no-unsupported-features/es-builtins
     expect(getResult).toEqual(Object.fromEntries(map));
   });
   it('should accept a generic object input on hset', async () => {
@@ -113,7 +110,7 @@ describe('hash', () => {
     const value2 = v4();
     const objectToSet = {
       [field]: value,
-      [field2]: value2
+      [field2]: value2,
     };
     const result = await client.hset(key, objectToSet);
     expect(result).toBe(2);
@@ -130,13 +127,13 @@ describe('hash', () => {
     const value2 = v4();
     const objectToSet = {
       [field]: value,
-      [field2]: value2
+      [field2]: value2,
     };
     const result = await client.hset(key, objectToSet);
     expect(result).toBe(2);
 
-    await client.hdel(key, field2)
+    await client.hdel(key, field2);
     const getResult = await client.hgetall(key);
-    expect(getResult[value2]).toBeUndefined()
+    expect(getResult[value2]).toBeUndefined();
   });
 });

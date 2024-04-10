@@ -359,12 +359,12 @@ export class MomentoRedisAdapter
     if (typeof args[1] === 'object') {
       if (args[1] instanceof Map) {
         for (const [key, value] of args[1]) {
-          fieldsToSet.set(String(key), String(value))
+          fieldsToSet.set(String(key), String(value));
         }
       } else {
         dictionaryName = String(args[0]);
         fieldsToSet = new Map<string | Uint8Array, string | Uint8Array>(
-          Object.entries(args[1]),
+          Object.entries(args[1])
         );
       }
     } else {
