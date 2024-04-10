@@ -317,13 +317,15 @@ export class MomentoRedisAdapter
           value.toString(),
           {
             ttl: parsedTTl,
+            compress: this.useCompression,
           }
         );
       } else {
         rsp = await this.momentoClient.setIfAbsent(
           this.cacheName,
           key,
-          value.toString()
+          value.toString(),
+          {compress: this.useCompression}
         );
       }
 
@@ -403,7 +405,8 @@ export class MomentoRedisAdapter
     const rsp = await this.momentoClient.dictionarySetFields(
       this.cacheName,
       dictionaryName,
-      fieldsToSet
+      fieldsToSet,
+      {compress: this.useCompression}
     );
 
     if (rsp instanceof CacheDictionarySetFields.Success) {
@@ -444,7 +447,8 @@ export class MomentoRedisAdapter
     const rsp = await this.momentoClient.dictionaryGetFields(
       this.cacheName,
       String(args[0]),
-      fields
+      fields,
+      {decompress: this.useCompression}
     );
     if (rsp instanceof CacheDictionaryGetFields.Hit) {
       return Array.from(rsp.valueMap().values());
@@ -463,7 +467,8 @@ export class MomentoRedisAdapter
     const rsp = await this.momentoClient.dictionaryGetField(
       this.cacheName,
       String(key),
-      field
+      field,
+      {decompress: this.useCompression}
     );
     if (rsp instanceof CacheDictionaryGetField.Hit) {
       return rsp.valueString();
@@ -481,7 +486,8 @@ export class MomentoRedisAdapter
   async hgetall(key: RedisKey): Promise<Record<string, string>> {
     const rsp = await this.momentoClient.dictionaryFetch(
       this.cacheName,
-      String(key)
+      String(key),
+      {decompress: this.useCompression}
     );
     if (rsp instanceof CacheDictionaryFetch.Hit) {
       return rsp.valueRecord();
