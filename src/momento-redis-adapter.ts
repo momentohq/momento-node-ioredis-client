@@ -317,13 +317,15 @@ export class MomentoRedisAdapter
           value.toString(),
           {
             ttl: parsedTTl,
+            compress: this.useCompression,
           }
         );
       } else {
         rsp = await this.momentoClient.setIfAbsent(
           this.cacheName,
           key,
-          value.toString()
+          value.toString(),
+          {compress: this.useCompression}
         );
       }
 
