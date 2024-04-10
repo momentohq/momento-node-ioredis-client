@@ -113,7 +113,6 @@
         }
       ],
       "require-await": "error",
-      "@typescript-eslint/require-await": "error",
       "import/no-duplicates": "error"
     },
     "settings": {
@@ -132,8 +131,7 @@
       "dist",
       "node_modules",
       "examples",
-      "**/*.d.ts",
-      "jest*.config.ts"
+      "**/*.d.ts"
     ]
   },
   "jest": {
