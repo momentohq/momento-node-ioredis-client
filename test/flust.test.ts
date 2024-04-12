@@ -8,8 +8,8 @@ describe('flush', () => {
     const key = v4();
     const value = v4();
 
-    // Set initial key value with a 5 seconds expiration
-    await client.set(key, value);
+    // Set initial value w/ long ttl
+    await client.set(key, value, 'EX', 1000);
 
     // Flush cache
     await client.flushdb();
