@@ -616,7 +616,7 @@ export class MomentoRedisAdapter
       this.emitError('flushdb', rsp.message(), rsp.errorCode());
       return 'OK';
     } else {
-      this.emitError('pexpire', 'unexpected-response');
+      this.emitError('flushdb', 'unexpected-response');
       return 'OK';
     }
   }
