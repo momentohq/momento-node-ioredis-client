@@ -16,6 +16,9 @@ import {
   MomentoErrorCode,
 } from '@gomomento/sdk';
 import {RedisKey} from 'ioredis';
+import * as zstd from '@mongodb-js/zstd';
+
+const TEXT_DECODER = new TextDecoder();
 
 export interface MomentoIORedis {
   get(key: RedisKey): Promise<string | null>;
@@ -161,6 +164,10 @@ export interface MomentoIORedis {
   quit(): Promise<'OK'>;
 }
 
+export interface MomentoRedisAdapterOptions {
+  useCompression?: boolean;
+}
+
 export class MomentoRedisAdapter
   extends EventEmitter
   implements MomentoIORedis
@@ -169,12 +176,16 @@ export class MomentoRedisAdapter
   cacheName: string;
   useCompression: boolean;
 
-  constructor(momentoClient: CacheClient, cacheName: string) {
+  constructor(
+    momentoClient: CacheClient,
+    cacheName: string,
+    options?: MomentoRedisAdapterOptions
+  ) {
     super();
     this.momentoClient = momentoClient;
     this.cacheName = cacheName;
 
-    this.useCompression = momentoClient.configuration.hasCompressionStrategy();
+    this.useCompression = options?.useCompression ?? false;
   }
 
   async del(...args: [...keys: RedisKey[]]): Promise<number> {
@@ -192,11 +203,13 @@ export class MomentoRedisAdapter
   }
 
   async get(key: RedisKey): Promise<string | null> {
-    const rsp = await this.momentoClient.get(this.cacheName, key, {
-      decompress: this.useCompression,
-    });
+    const rsp = await this.momentoClient.get(this.cacheName, key);
     if (rsp instanceof CacheGet.Hit) {
-      return rsp.valueString();
+      if (this.useCompression) {
+        return decompress(rsp.valueUint8Array());
+      } else {
+        return rsp.valueString();
+      }
     } else if (rsp instanceof CacheGet.Miss) {
       return null;
     } else if (rsp instanceof CacheGet.Error) {
@@ -313,24 +326,29 @@ export class MomentoRedisAdapter
       nxFlagSet = true;
     }
 
+    let rsp: CacheSetIfAbsent.Response;
+    let maybeCompressedValue: string | Uint8Array;
+    if (this.useCompression) {
+      maybeCompressedValue = await compress(value);
+    } else {
+      maybeCompressedValue = value.toString();
+    }
+
     if (nxFlagSet) {
-      let rsp: CacheSetIfAbsent.Response;
       if (parsedTTl > -1) {
         rsp = await this.momentoClient.setIfAbsent(
           this.cacheName,
           key,
-          value.toString(),
+          maybeCompressedValue,
           {
             ttl: parsedTTl,
-            compress: this.useCompression,
           }
         );
       } else {
         rsp = await this.momentoClient.setIfAbsent(
           this.cacheName,
           key,
-          value.toString(),
-          {compress: this.useCompression}
+          maybeCompressedValue
         );
       }
 
@@ -352,7 +370,7 @@ export class MomentoRedisAdapter
         rsp = await this.momentoClient.set(
           this.cacheName,
           key,
-          value.toString(),
+          maybeCompressedValue,
           {
             ttl: parsedTTl,
           }
@@ -361,8 +379,7 @@ export class MomentoRedisAdapter
         rsp = await this.momentoClient.set(
           this.cacheName,
           key,
-          value.toString(),
-          {compress: this.useCompression}
+          maybeCompressedValue
         );
       }
 
@@ -392,29 +409,42 @@ export class MomentoRedisAdapter
     ]
   ): Promise<number> {
     let fieldsToSet: Map<string | Uint8Array, string | Uint8Array> = new Map();
-    let dictionaryName = String(args[0]);
+    const dictionaryName = String(args[0]);
     if (typeof args[1] === 'object') {
       if (args[1] instanceof Map) {
         for (const [key, value] of args[1]) {
-          fieldsToSet.set(String(key), String(value));
+          fieldsToSet.set(
+            String(key),
+            this.useCompression ? await compress(value) : String(value)
+          );
         }
       } else {
-        dictionaryName = String(args[0]);
-        fieldsToSet = new Map<string | Uint8Array, string | Uint8Array>(
-          Object.entries(args[1])
-        );
+        fieldsToSet = new Map<string | Uint8Array, string | Uint8Array>();
+        const entries = Object.entries(args[1]);
+        for (const [key, value] of entries) {
+          fieldsToSet.set(
+            String(key),
+            this.useCompression
+              ? await compress(value as string | Buffer | number)
+              : String(value)
+          );
+        }
       }
     } else {
       for (let i = 1; i < args.length; i += 2) {
-        fieldsToSet.set(String(args[i]), String(args[i + 1]));
+        fieldsToSet.set(
+          String(args[i]),
+          this.useCompression
+            ? await compress(String(args[i + 1]))
+            : String(args[i + 1])
+        );
       }
     }
 
     const rsp = await this.momentoClient.dictionarySetFields(
       this.cacheName,
       dictionaryName,
-      fieldsToSet,
-      {compress: this.useCompression}
+      fieldsToSet
     );
 
     if (rsp instanceof CacheDictionarySetFields.Success) {
@@ -455,11 +485,20 @@ export class MomentoRedisAdapter
     const rsp = await this.momentoClient.dictionaryGetFields(
       this.cacheName,
       String(args[0]),
-      fields,
-      {decompress: this.useCompression}
+      fields
     );
     if (rsp instanceof CacheDictionaryGetFields.Hit) {
-      return Array.from(rsp.valueMap().values());
+      if (this.useCompression) {
+        const values = [];
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (const [_, value] of rsp.valueMapStringUint8Array().entries()) {
+          values.push(await decompress(value));
+        }
+        return values;
+      } else {
+        return Array.from(rsp.valueMap().values());
+      }
     } else if (rsp instanceof CacheDictionaryGetFields.Miss) {
       return [];
     } else if (rsp instanceof CacheDictionaryGetFields.Error) {
@@ -475,11 +514,14 @@ export class MomentoRedisAdapter
     const rsp = await this.momentoClient.dictionaryGetField(
       this.cacheName,
       String(key),
-      field,
-      {decompress: this.useCompression}
+      field
     );
     if (rsp instanceof CacheDictionaryGetField.Hit) {
-      return rsp.valueString();
+      if (this.useCompression) {
+        return await decompress(rsp.valueUint8Array());
+      } else {
+        return rsp.valueString();
+      }
     } else if (rsp instanceof CacheDictionaryGetField.Miss) {
       return null;
     } else if (rsp instanceof CacheDictionaryGetField.Error) {
@@ -494,11 +536,18 @@ export class MomentoRedisAdapter
   async hgetall(key: RedisKey): Promise<Record<string, string>> {
     const rsp = await this.momentoClient.dictionaryFetch(
       this.cacheName,
-      String(key),
-      {decompress: this.useCompression}
+      String(key)
     );
     if (rsp instanceof CacheDictionaryFetch.Hit) {
-      return rsp.valueRecord();
+      const record: Record<string, string> = {};
+      for (const [key, value] of rsp.valueMapStringUint8Array().entries()) {
+        if (this.useCompression) {
+          record[key] = await decompress(value);
+        } else {
+          record[key] = TEXT_DECODER.decode(value);
+        }
+      }
+      return record;
     } else if (rsp instanceof CacheDictionaryFetch.Miss) {
       return {};
     } else if (rsp instanceof CacheDictionaryFetch.Error) {
@@ -623,4 +672,14 @@ export class MomentoRedisAdapter
       return 'OK';
     }
   }
+}
+
+async function decompress(compressed: Uint8Array): Promise<string> {
+  return (await zstd.decompress(Buffer.from(compressed))).toString();
+}
+
+async function compress(value: string | Buffer | number): Promise<Uint8Array> {
+  const buffer =
+    value instanceof Buffer ? value : Buffer.from(value.toString());
+  return await zstd.compress(buffer);
 }
