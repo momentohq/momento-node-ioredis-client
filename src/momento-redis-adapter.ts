@@ -202,7 +202,7 @@ export class MomentoRedisAdapter
     } else if (rsp instanceof CacheGet.Error) {
       this.emitError('get', rsp.message(), rsp.errorCode());
     } else {
-      this.emitError('get', `unexpected-response ${rsp}`);
+      this.emitError('get', `unexpected-response ${rsp.toString()}`);
     }
     return null;
   }
@@ -341,7 +341,10 @@ export class MomentoRedisAdapter
       } else if (rsp instanceof CacheSetIfAbsent.Error) {
         this.emitError('set-not-exists', rsp.message(), rsp.errorCode());
       } else {
-        this.emitError('set-not-exists', `unexpected-response ${rsp}`);
+        this.emitError(
+          'set-not-exists',
+          `unexpected-response ${rsp.toString()}`
+        );
       }
     } else {
       let rsp: CacheSet.Response;
@@ -368,7 +371,7 @@ export class MomentoRedisAdapter
       } else if (rsp instanceof CacheSet.Error) {
         this.emitError('set', rsp.message(), rsp.errorCode());
       } else {
-        this.emitError('set', `unexpected-response ${rsp}`);
+        this.emitError('set', `unexpected-response ${rsp.toString()}`);
       }
     }
 
@@ -420,7 +423,7 @@ export class MomentoRedisAdapter
       this.emitError('hset', rsp.message(), rsp.errorCode());
       return 0;
     } else {
-      this.emitError('hset', `unexpected-response ${rsp}`);
+      this.emitError('hset', `unexpected-response ${rsp.toString()}`);
       return 0;
     }
   }
@@ -463,7 +466,7 @@ export class MomentoRedisAdapter
       this.emitError('hmget', rsp.message(), rsp.errorCode());
       return [];
     } else {
-      this.emitError('hmget', `unexpected-response ${rsp}`);
+      this.emitError('hmget', `unexpected-response ${rsp.toString()}`);
       return [];
     }
   }
@@ -483,7 +486,7 @@ export class MomentoRedisAdapter
       this.emitError('hget', rsp.message(), rsp.errorCode());
       return null;
     } else {
-      this.emitError('hget', `unexpected-response ${rsp}`);
+      this.emitError('hget', `unexpected-response ${rsp.toString()}`);
       return null;
     }
   }
@@ -502,7 +505,7 @@ export class MomentoRedisAdapter
       this.emitError('hgetall', rsp.message(), rsp.errorCode());
       return {};
     } else {
-      this.emitError('hgetall', `unexpected-response ${rsp}`);
+      this.emitError('hgetall', `unexpected-response ${rsp.toString()}`);
       return {};
     }
   }
@@ -525,7 +528,7 @@ export class MomentoRedisAdapter
       this.emitError('hdel', rsp.message(), rsp.errorCode());
       return 0;
     } else {
-      this.emitError('hdel', `unexpected-response ${rsp}`);
+      this.emitError('hdel', `unexpected-response ${rsp.toString()}`);
       return 0;
     }
   }
@@ -539,7 +542,7 @@ export class MomentoRedisAdapter
     } else if (rsp instanceof CacheItemGetTtl.Error) {
       this.emitError('ttl', rsp.message(), rsp.errorCode());
     } else {
-      this.emitError('ttl', `unexpected-response ${rsp}`);
+      this.emitError('ttl', `unexpected-response ${rsp.toString()}`);
     }
     return null;
   }
@@ -553,7 +556,7 @@ export class MomentoRedisAdapter
     } else if (rsp instanceof CacheItemGetTtl.Error) {
       this.emitError('ttl', rsp.message(), rsp.errorCode());
     } else {
-      this.emitError('ttl', `unexpected-response ${rsp}`);
+      this.emitError('ttl', `unexpected-response ${rsp.toString()}`);
     }
     return null;
   }
@@ -601,7 +604,7 @@ export class MomentoRedisAdapter
       } else if (rsp instanceof CacheUpdateTtl.Error) {
         this.emitError('pexpire', rsp.message(), rsp.errorCode());
       } else {
-        this.emitError('pexpire', `unexpected-response ${rsp}`);
+        this.emitError('pexpire', `unexpected-response ${rsp.toString()}`);
       }
     }
 
@@ -616,7 +619,7 @@ export class MomentoRedisAdapter
       this.emitError('flushdb', rsp.message(), rsp.errorCode());
       return 'OK';
     } else {
-      this.emitError('flushdb', `unexpected-response ${rsp}`);
+      this.emitError('flushdb', `unexpected-response ${rsp.toString()}`);
       return 'OK';
     }
   }
