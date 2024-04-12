@@ -13,7 +13,7 @@ interface config {
   cacheName: string;
 }
 
-const authTokenEnvVarName = 'MOMENTO_AUTH_TOKEN';
+const authTokenEnvVarName = 'MOMENTO_API_KEY';
 
 function parseConfig(): config {
   const enableMomentoVar = process.env['MOMENTO_ENABLED'],
