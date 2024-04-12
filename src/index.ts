@@ -7,3 +7,5 @@ export {
   NewIORedisWrapper,
   NewIORedisClusterWrapper,
 };
+
+export {CacheClient, Configurations, CredentialProvider} from '@gomomento/sdk';
