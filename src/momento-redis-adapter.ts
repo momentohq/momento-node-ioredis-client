@@ -7,6 +7,7 @@ import {
   CacheDictionaryGetFields,
   CacheDictionaryRemoveFields,
   CacheDictionarySetFields,
+  CacheFlush,
   CacheGet,
   CacheItemGetTtl,
   CacheSet,
@@ -153,6 +154,10 @@ export interface MomentoIORedis {
     ...args: [key: RedisKey, ...fields: (string | Buffer)[]]
   ): Promise<number>;
 
+  flushdb(): Promise<'OK'>;
+  flushdb(async: 'ASYNC'): Promise<'OK'>;
+  flushdb(sync: 'SYNC'): Promise<'OK'>;
+
   quit(): Promise<'OK'>;
 }
 
@@ -197,7 +202,7 @@ export class MomentoRedisAdapter
     } else if (rsp instanceof CacheGet.Error) {
       this.emitError('get', rsp.message(), rsp.errorCode());
     } else {
-      this.emitError('get', 'unexpected-response');
+      this.emitError('get', 'unexpected-response ' + typeof rsp);
     }
     return null;
   }
@@ -336,7 +341,7 @@ export class MomentoRedisAdapter
       } else if (rsp instanceof CacheSetIfAbsent.Error) {
         this.emitError('set-not-exists', rsp.message(), rsp.errorCode());
       } else {
-        this.emitError('set-not-exists', 'unexpected-response');
+        this.emitError('set-not-exists', 'unexpected-response ' + typeof rsp);
       }
     } else {
       let rsp: CacheSet.Response;
@@ -363,7 +368,7 @@ export class MomentoRedisAdapter
       } else if (rsp instanceof CacheSet.Error) {
         this.emitError('set', rsp.message(), rsp.errorCode());
       } else {
-        this.emitError('set', 'unexpected-response');
+        this.emitError('set', 'unexpected-response ' + typeof rsp);
       }
     }
 
@@ -534,7 +539,7 @@ export class MomentoRedisAdapter
     } else if (rsp instanceof CacheItemGetTtl.Error) {
       this.emitError('ttl', rsp.message(), rsp.errorCode());
     } else {
-      this.emitError('ttl', 'unexpected-response');
+      this.emitError('ttl', 'unexpected-response ' + typeof rsp);
     }
     return null;
   }
@@ -548,7 +553,7 @@ export class MomentoRedisAdapter
     } else if (rsp instanceof CacheItemGetTtl.Error) {
       this.emitError('ttl', rsp.message(), rsp.errorCode());
     } else {
-      this.emitError('ttl', 'unexpected-response');
+      this.emitError('ttl', 'unexpected-response ' + typeof rsp);
     }
     return null;
   }
@@ -601,5 +606,18 @@ export class MomentoRedisAdapter
     }
 
     return 0;
+  }
+
+  async flushdb(): Promise<'OK'> {
+    const rsp = await this.momentoClient.flushCache(this.cacheName);
+    if (rsp instanceof CacheFlush.Success) {
+      return 'OK';
+    } else if (rsp instanceof CacheFlush.Error) {
+      this.emitError('flushdb', rsp.message(), rsp.errorCode());
+      return 'OK';
+    } else {
+      this.emitError('flushdb', 'unexpected-response');
+      return 'OK';
+    }
   }
 }
