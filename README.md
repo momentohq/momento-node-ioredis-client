@@ -59,7 +59,7 @@ const Redis = new MomentoRedisAdapter(
   new CacheClient({
     configuration: Configurations.Laptop.v1(),
     credentialProvider: CredentialProvider.fromEnvironmentVariable({
-      environmentVariableName: 'MOMENTO_AUTH_TOKEN',
+      environmentVariableName: 'MOMENTO_API_KEY',
     }),
     defaultTtlSeconds: 3600,
   }),
@@ -88,7 +88,7 @@ In this package we provide wrapper functions that help you configure wether or n
 | EnvVar Name         | Description                                                | Default |
 |---------------------|------------------------------------------------------------|---------|
 | MOMENTO_ENABLED     | Will allow you to toggle between using Momento and IORedis | false   |
-| MOMENTO_AUTH_TOKEN  | The Momento Auth token you would like to use               | ""      |
+| MOMENTO_API_KEY  | The Momento Auth token you would like to use               | ""      |
 | CACHE_NAME          | The name of the Momento Cache to use if Momento is enabled | ""      |
 | DEFAULT_TTL_SECONDS | The number of seconds to cache items for by default        | 86400   |
 
