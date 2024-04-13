@@ -13,12 +13,15 @@ interface config {
   cacheName: string;
 }
 
-const authTokenEnvVarName = 'MOMENTO_API_KEY';
+const momentoApiKeyEnvVarName = 'MOMENTO_API_KEY';
+const momentoEnabledEnvVarName = 'MOMENTO_ENABLED';
+const momentoCacheNameEnvVarName = 'MOMENTO_CACHE_NAME';
+const momentoDefaultTtlEnvVarName = 'MOMENTO_DEFAULT_TTL_SECONDS';
 
 function parseConfig(): config {
-  const enableMomentoVar = process.env['MOMENTO_ENABLED'],
-    defaultTTLSecondsVar = process.env['DEFAULT_TTL_SECONDS'],
-    cacheNameVar = process.env['CACHE_NAME'];
+  const enableMomentoVar = process.env[momentoEnabledEnvVarName],
+    defaultTTLSecondsVar = process.env[momentoDefaultTtlEnvVarName],
+    cacheNameVar = process.env[momentoCacheNameEnvVarName];
   let enableMomento = false,
     defaultTTLSeconds = 86400,
     cacheName = '';
@@ -26,12 +29,16 @@ function parseConfig(): config {
   if (enableMomentoVar !== undefined && enableMomentoVar === 'true') {
     enableMomento = true;
     if (defaultTTLSecondsVar === undefined) {
-      throw new Error('missing DEFAULT_TTL env var when using momento');
+      throw new Error(
+        `missing ${momentoDefaultTtlEnvVarName} env var when using momento`
+      );
     } else {
       defaultTTLSeconds = Number.parseInt(defaultTTLSecondsVar);
     }
     if (cacheNameVar === undefined || cacheNameVar === '') {
-      throw new Error('missing CACHE_NAME env var when using momento');
+      throw new Error(
+        `missing ${momentoCacheNameEnvVarName} env var when using momento`
+      );
     } else {
       cacheName = cacheNameVar;
     }
@@ -49,9 +56,9 @@ export function NewIORedisWrapper(options?: RedisOptions): MomentoIORedis {
     return new MomentoRedisAdapter(
       new CacheClient({
         configuration: Configurations.Laptop.v1(),
-        credentialProvider: CredentialProvider.fromEnvironmentVariable({
-          environmentVariableName: authTokenEnvVarName,
-        }),
+        credentialProvider: CredentialProvider.fromEnvironmentVariable(
+          momentoApiKeyEnvVarName
+        ),
         defaultTtlSeconds: config.defaultTTLSeconds,
       }),
       config.cacheName
@@ -74,9 +81,9 @@ export function NewIORedisClusterWrapper(
     return new MomentoRedisAdapter(
       new CacheClient({
         configuration: Configurations.Laptop.v1(),
-        credentialProvider: CredentialProvider.fromEnvironmentVariable({
-          environmentVariableName: authTokenEnvVarName,
-        }),
+        credentialProvider: CredentialProvider.fromEnvironmentVariable(
+          momentoApiKeyEnvVarName
+        ),
         defaultTtlSeconds: config.defaultTTLSeconds,
       }),
       config.cacheName
