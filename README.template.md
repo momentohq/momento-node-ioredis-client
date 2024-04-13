@@ -81,12 +81,12 @@ const redisClusterClient = NewIORedisClusterWrapper([], {});
 
 In this package we provide wrapper functions that help you configure wether or not to use Momento and how client settings should look based off environment variables. This is to try and make for a simpler drop in experience where you might be running Momento or Redis based off the environment or Region. This applies for `NewIORedisWrapper` and `NewIORedisClusterWrapper` wrapper functions.
 
-| EnvVar Name         | Description                                                | Default |
-|---------------------|------------------------------------------------------------|---------|
-| MOMENTO_ENABLED     | Will allow you to toggle between using Momento and IORedis | false   |
-| MOMENTO_API_KEY  | The Momento Auth token you would like to use               | ""      |
-| CACHE_NAME          | The name of the Momento Cache to use if Momento is enabled | ""      |
-| DEFAULT_TTL_SECONDS | The number of seconds to cache items for by default        | 86400   |
+| EnvVar Name                 | Description                                                | Default |
+|-----------------------------|------------------------------------------------------------|---------|
+| MOMENTO_ENABLED             | Will allow you to toggle between using Momento and IORedis | false   |
+| MOMENTO_API_KEY             | The Momento Auth token you would like to use               | ""      |
+| MOMENTO_CACHE_NAME          | The name of the Momento Cache to use if Momento is enabled | ""      |
+| MOMENTO_DEFAULT_TTL_SECONDS | The number of seconds to cache items for by default        | 86400   |
 
 ## Installation
 
