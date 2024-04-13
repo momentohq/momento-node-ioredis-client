@@ -27,7 +27,7 @@ To switch your existing `ioredis` application to use Momento Cache, you only nee
 Alternately, if you'd like to be able to easily switch back and forth between Momento and Redis using environment variables, you can use the `NewIORedisWrapper` and `NewIORedisClusterWrapper` wrapper functions:
 
 ```typescript
-{% include "./examples/src/wrapper.ts" %}
+{% include "./examples/src/wrappers.ts" %}
 ```
 
 **NOTE**: The Momento `ioredis` implementation currently supports simple key/value pairs (`GET`, `SET`, `DELETE`) as well as hash values (`HGET`/`HSET`). We will continue to add support for additional Redis APIs in the future; for more information see the [current Redis API support](#current-redis-api-support) section later in this doc.
