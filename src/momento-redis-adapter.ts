@@ -92,7 +92,7 @@ export interface MomentoIORedis {
     nx: 'NX'
   ): Promise<'OK' | null>;
 
-  incr(key: RedisKey): Promise<number | string>;
+  incr(key: RedisKey): Promise<number | null>;
 
   ttl(key: RedisKey): Promise<number | null>;
 
@@ -398,17 +398,21 @@ export class MomentoRedisAdapter
     return null;
   }
 
-  async incr(key: RedisKey): Promise<number | string> {
+  async incr(key: RedisKey): Promise<number | null> {
+    if (this.useCompression) {
+      this.emitError('incr', 'compression-not-supported');
+      return null;
+    }
+
     const rsp = await this.momentoClient.increment(this.cacheName, key);
     if (rsp instanceof CacheIncrement.Success) {
       return rsp.value();
     } else if (rsp instanceof CacheIncrement.Error) {
       this.emitError('incr', rsp.message(), rsp.errorCode());
-      return rsp.message();
     } else {
       this.emitError('incr', `unexpected-response ${rsp.toString()}`);
-      return rsp.toString();
     }
+    return null;
   }
 
   async hset(

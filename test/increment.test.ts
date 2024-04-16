@@ -1,7 +1,7 @@
 import {SetupIntegrationTest} from './integration-setup';
 import {v4} from 'uuid';
 
-const {client} = SetupIntegrationTest();
+const {client} = SetupIntegrationTest(false);
 
 describe('increment', () => {
   it('should increment the value of the key by 1 if the key exists', async () => {
