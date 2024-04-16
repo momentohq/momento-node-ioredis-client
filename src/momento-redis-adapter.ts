@@ -9,6 +9,7 @@ import {
   CacheDictionarySetFields,
   CacheFlush,
   CacheGet,
+  CacheIncrement,
   CacheItemGetTtl,
   CacheSet,
   CacheSetIfAbsent,
@@ -90,6 +91,8 @@ export interface MomentoIORedis {
     unixTimeMilliseconds: number | string,
     nx: 'NX'
   ): Promise<'OK' | null>;
+
+  incr(key: RedisKey): Promise<number | string>;
 
   ttl(key: RedisKey): Promise<number | null>;
 
@@ -393,6 +396,19 @@ export class MomentoRedisAdapter
     }
 
     return null;
+  }
+
+  async incr(key: RedisKey): Promise<number | string> {
+    const rsp = await this.momentoClient.increment(this.cacheName, key);
+    if (rsp instanceof CacheIncrement.Success) {
+      return rsp.value();
+    } else if (rsp instanceof CacheIncrement.Error) {
+      this.emitError('incr', rsp.message(), rsp.errorCode());
+      return rsp.message();
+    } else {
+      this.emitError('incr', `unexpected-response ${rsp.toString()}`);
+      return rsp.toString();
+    }
   }
 
   async hset(
