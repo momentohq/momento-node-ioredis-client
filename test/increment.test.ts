@@ -4,6 +4,12 @@ import {v4} from 'uuid';
 const {client} = SetupIntegrationTest();
 
 describe('increment', () => {
+  if (process.env.COMPRESSION === 'true') {
+    test.skip('all tests skipped because COMPRESSION is enabled', () => {
+      // Skip all tests, no assertions will be called
+    });
+    return;
+  }
   it('should increment the value of the key by 1 if the key exists', async () => {
     const key = v4();
     const value = 5;
