@@ -16,6 +16,10 @@ export function testCacheName(): string {
   return name + v4();
 }
 
+function useCompression(): boolean {
+  return process.env.COMPRESSION === 'true';
+}
+
 const deleteCacheIfExists = async (momento: CacheClient, cacheName: string) => {
   const deleteResponse = await momento.deleteCache(cacheName);
   if (deleteResponse instanceof DeleteCache.Error) {
@@ -41,17 +45,17 @@ export function isRedisBackedTest() {
   return process.env.MOMENTO_ENABLED !== 'true';
 }
 
-export function SetupIntegrationTest(useCompression = true): {
+export function SetupIntegrationTest(): {
   client: MomentoIORedis;
 } {
   if (isRedisBackedTest()) {
     return setupIntegrationTestWithRedis();
   } else {
-    return setupIntegrationTestWithMomento(useCompression);
+    return setupIntegrationTestWithMomento();
   }
 }
 
-function setupIntegrationTestWithMomento(useCompression = true) {
+function setupIntegrationTestWithMomento() {
   const cacheName = testCacheName();
 
   beforeAll(async () => {
@@ -78,7 +82,7 @@ function setupIntegrationTestWithMomento(useCompression = true) {
     momentoClient,
     cacheName,
     {
-      useCompression: useCompression,
+      useCompression: useCompression(),
     }
   );
 
