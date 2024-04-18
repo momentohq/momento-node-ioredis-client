@@ -217,3 +217,19 @@ describe('get, set, and delete', () => {
     }
   });
 });
+
+describe('setex', () => {
+  it('should expire a value after a number of seconds using setex', async () => {
+    const key = v4();
+    const value = v4();
+    const setExResult = await client.setex(key, 3, value);
+    expect(setExResult).toBe('OK');
+    const getResult = await client.get(key);
+    expect(getResult).toEqual(value);
+
+    await sleep(3);
+
+    const getResult2 = await client.get(key);
+    expect(getResult2).toBeNull();
+  });
+});

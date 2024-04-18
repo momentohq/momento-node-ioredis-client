@@ -92,6 +92,12 @@ export interface MomentoIORedis {
     nx: 'NX'
   ): Promise<'OK' | null>;
 
+  setex(
+    key: RedisKey,
+    seconds: number | string,
+    value: string | Buffer | number
+  ): Promise<'OK' | null>;
+
   incr(key: RedisKey): Promise<number | null>;
 
   ttl(key: RedisKey): Promise<number | null>;
@@ -396,6 +402,14 @@ export class MomentoRedisAdapter
     }
 
     return null;
+  }
+
+  async setex(
+    key: RedisKey,
+    seconds: number | string,
+    value: string | Buffer | number
+  ): Promise<'OK' | null> {
+    return await this.set(key, value, 'EX', seconds);
   }
 
   async incr(key: RedisKey): Promise<number | null> {
