@@ -47,6 +47,7 @@ export function isRedisBackedTest() {
 
 export function SetupIntegrationTest(): {
   client: MomentoIORedis;
+  compression?: boolean;
 } {
   if (isRedisBackedTest()) {
     return setupIntegrationTestWithRedis();
@@ -86,7 +87,10 @@ function setupIntegrationTestWithMomento() {
     }
   );
 
-  return {client: momentoNodeRedisClient};
+  return {
+    client: momentoNodeRedisClient,
+    compression: momentoNodeRedisClient.useCompression,
+  };
 }
 
 function setupIntegrationTestWithRedis() {
