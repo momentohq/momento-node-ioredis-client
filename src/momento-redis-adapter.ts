@@ -624,6 +624,13 @@ export class MomentoRedisAdapter
       ...keyValues: (RedisKey | string | Buffer | number)[]
     ]
   ): Promise<'OK'> {
+    if (args.length % 2 !== 0) {
+      this.emitError(
+        'mset',
+        "wrong number of arguments for 'mset' command",
+        MomentoErrorCode.INVALID_ARGUMENT_ERROR
+      );
+    }
     for (let i = 0; i < args.length; i += 2) {
       await this.set(args[i] as RedisKey, args[i + 1]);
     }
