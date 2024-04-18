@@ -2,11 +2,11 @@ import {v4} from 'uuid';
 
 import {SetupIntegrationTest} from './integration-setup';
 
-const {client} = SetupIntegrationTest();
+const {client, compression} = SetupIntegrationTest();
 
 describe('increment, with compression client', () => {
   it('should return error saying compression not supported', async () => {
-    if (process.env.COMPRESSION === 'true') {
+    if (compression) {
       const key = v4();
       const value = 5;
 
@@ -23,7 +23,9 @@ describe('increment, with compression client', () => {
         };
         expect(momentoError.context.op).toBe('incr');
         expect(momentoError.context.platform).toBe('momento');
-        expect(momentoError.context.msg).toBe('compression-not-supported');
+        expect(momentoError.context.msg).toBe(
+          'Increment is not supported when compression is enabled.'
+        );
       }
     }
   });

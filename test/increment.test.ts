@@ -1,10 +1,10 @@
 import {SetupIntegrationTest} from './integration-setup';
 import {v4} from 'uuid';
 
-const {client} = SetupIntegrationTest();
+const {client, compression} = SetupIntegrationTest();
 
 describe('increment', () => {
-  if (process.env.COMPRESSION === 'true') {
+  if (compression) {
     test.skip('all tests skipped because COMPRESSION is enabled', () => {
       // Skip all tests, no assertions will be called
     });

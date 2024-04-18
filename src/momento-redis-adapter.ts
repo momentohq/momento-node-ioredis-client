@@ -400,7 +400,10 @@ export class MomentoRedisAdapter
 
   async incr(key: RedisKey): Promise<number | null> {
     if (this.useCompression) {
-      this.emitError('incr', 'compression-not-supported');
+      this.emitError(
+        'incr',
+        'Increment is not supported when compression is enabled.'
+      );
       return null;
     }
 
