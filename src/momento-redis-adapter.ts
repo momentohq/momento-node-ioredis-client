@@ -160,6 +160,21 @@ export interface MomentoIORedis {
     ...args: [key: RedisKey, ...fields: (string | Buffer)[]]
   ): Promise<number>;
 
+  // mset(
+  //   ...args: [...[key: RedisKey, value: string | number | Buffer][]]
+  // ): Promise<'OK'>;
+  // mset(
+  //   ...args: [key: RedisKey, value: string | number | Buffer][]
+  // ): Promise<'OK'>;
+
+  mset(
+    ...args: [[key: RedisKey, value: string | number | Buffer][]]
+  ): Promise<'OK'>;
+
+  mget(
+    ...args: [key: RedisKey, ...keys: RedisKey[]]
+  ): Promise<(string | null)[]>;
+
   flushdb(): Promise<'OK'>;
   flushdb(async: 'ASYNC'): Promise<'OK'>;
   flushdb(sync: 'SYNC'): Promise<'OK'>;
@@ -603,6 +618,57 @@ export class MomentoRedisAdapter
       this.emitError('hdel', `unexpected-response ${rsp.toString()}`);
       return 0;
     }
+  }
+
+  // async mset(
+  //   ...args: [...[key: RedisKey, value: string | number | Buffer][]]
+  // ): Promise<'OK'> {
+  //   const keyValue = args.flat();
+  //   for (let i = 0; i < keyValue.length; i += 2) {
+  //     await this.set(keyValue[i] as RedisKey, keyValue[i + 1]);
+  //   }
+  //   return 'OK';
+  // }
+
+  // async mset(
+  //   ...args: [[key: RedisKey, value: string | number | Buffer][]]
+  // ): Promise<'OK'> {
+  //   const keyValuePairs = args.flat();
+  //   const promises = keyValuePairs.map(([key, value]) => {
+  //     return this.set(key, value);
+  //   });
+  //   await Promise.all(promises);
+  //   return 'OK';
+  // }
+
+  async mset(
+    ...args: [[key: RedisKey, value: string | number | Buffer][]]
+  ): Promise<'OK'> {
+    const keyValuePairs = args[0]; // Unwrap the array containing key-value pairs
+    const promises = keyValuePairs.map(([key, value]) => {
+      return this.set(key, value); // Call the set method for each key-value pair
+    });
+    await Promise.all(promises);
+    return 'OK';
+  }
+
+  // async mset(
+  //   ...args: [key: RedisKey, value: string | number | Buffer][]
+  // ): Promise<'OK'> {
+  //   for (const [key, value] of args) {
+  //     await this.set(key, value);
+  //   }
+  //   return 'OK';
+  // }
+
+  async mget(
+    ...args: [key: RedisKey, ...keys: RedisKey[]]
+  ): Promise<(string | null)[]> {
+    const promises: Promise<string | null>[] = [];
+    args.forEach(key => {
+      promises.push(this.get(key));
+    });
+    return await Promise.all(promises);
   }
 
   async ttl(key: RedisKey): Promise<number | null> {
