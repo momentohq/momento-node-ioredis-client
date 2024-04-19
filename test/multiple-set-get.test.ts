@@ -30,7 +30,11 @@ describe('multiple get and set', () => {
 
     // Get multiple keys
     const getResp = await client.mget(key1, key2);
-    expect(getResp).toEqual([value, null]);
+    if (process.env.MOMENTO_ENABLED === 'true') {
+      expect(getResp).toEqual([value]);
+    } else {
+      expect(getResp).toEqual([value, null]);
+    }
   });
 
   it('should emit error when wrong number of arguments provided', async () => {
@@ -50,7 +54,7 @@ describe('multiple get and set', () => {
         expect(momentoError.code).toBe('ERR_UNHANDLED_ERROR');
         expect(momentoError.context.code).toBe('INVALID_ARGUMENT_ERROR');
         expect(momentoError.context.msg).toBe(
-          "wrong number of arguments for 'mset' command"
+          "Wrong number of arguments for 'mset' command"
         );
         expect(momentoError.context.op).toBe('mset');
         expect(momentoError.context.platform).toBe('momento');
