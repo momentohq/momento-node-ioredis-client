@@ -9,6 +9,7 @@ import {
   CacheDictionarySetFields,
   CacheFlush,
   CacheGet,
+  CacheIncrement,
   CacheItemGetTtl,
   CacheSet,
   CacheSetIfAbsent,
@@ -91,6 +92,14 @@ export interface MomentoIORedis {
     nx: 'NX'
   ): Promise<'OK' | null>;
 
+  setex(
+    key: RedisKey,
+    seconds: number | string,
+    value: string | Buffer | number
+  ): Promise<'OK' | null>;
+
+  incr(key: RedisKey): Promise<number | null>;
+
   ttl(key: RedisKey): Promise<number | null>;
 
   pttl(key: RedisKey): Promise<number | null>;
@@ -156,6 +165,18 @@ export interface MomentoIORedis {
   hdel(
     ...args: [key: RedisKey, ...fields: (string | Buffer)[]]
   ): Promise<number>;
+
+  mset(
+    ...args: [
+      key: RedisKey,
+      value: string | Buffer | number,
+      ...keyValues: (RedisKey | string | Buffer | number)[]
+    ]
+  ): Promise<'OK'>;
+
+  mget(
+    ...args: [key: RedisKey, ...keys: RedisKey[]]
+  ): Promise<(string | null)[]>;
 
   flushdb(): Promise<'OK'>;
   flushdb(async: 'ASYNC'): Promise<'OK'>;
@@ -395,6 +416,34 @@ export class MomentoRedisAdapter
     return null;
   }
 
+  async setex(
+    key: RedisKey,
+    seconds: number | string,
+    value: string | Buffer | number
+  ): Promise<'OK' | null> {
+    return await this.set(key, value, 'EX', seconds);
+  }
+
+  async incr(key: RedisKey): Promise<number | null> {
+    if (this.useCompression) {
+      this.emitError(
+        'incr',
+        'Increment is not supported when compression is enabled.'
+      );
+      return null;
+    }
+
+    const rsp = await this.momentoClient.increment(this.cacheName, key);
+    if (rsp instanceof CacheIncrement.Success) {
+      return rsp.value();
+    } else if (rsp instanceof CacheIncrement.Error) {
+      this.emitError('incr', rsp.message(), rsp.errorCode());
+    } else {
+      this.emitError('incr', `unexpected-response ${rsp.toString()}`);
+    }
+    return null;
+  }
+
   async hset(
     ...args: [
       RedisKey,
@@ -580,6 +629,36 @@ export class MomentoRedisAdapter
       this.emitError('hdel', `unexpected-response ${rsp.toString()}`);
       return 0;
     }
+  }
+
+  async mset(
+    ...args: [
+      key: RedisKey,
+      value: string | Buffer | number,
+      ...keyValues: (RedisKey | string | Buffer | number)[]
+    ]
+  ): Promise<'OK'> {
+    if (args.length % 2 !== 0) {
+      this.emitError(
+        'mset',
+        "wrong number of arguments for 'mset' command",
+        MomentoErrorCode.INVALID_ARGUMENT_ERROR
+      );
+    }
+    for (let i = 0; i < args.length; i += 2) {
+      await this.set(args[i] as RedisKey, args[i + 1]);
+    }
+    return 'OK';
+  }
+
+  async mget(
+    ...args: [key: RedisKey, ...keys: RedisKey[]]
+  ): Promise<(string | null)[]> {
+    const promises: Promise<string | null>[] = [];
+    args.forEach(key => {
+      promises.push(this.get(key));
+    });
+    return await Promise.all(promises);
   }
 
   async ttl(key: RedisKey): Promise<number | null> {
