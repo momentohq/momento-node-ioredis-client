@@ -707,6 +707,8 @@ export class MomentoRedisAdapter
       }
     } else if (resp instanceof CacheGetBatch.Error) {
       this.emitError('mget', resp.message(), resp.errorCode());
+    } else {
+      this.emitError('mget', `unexpected-response ${resp.toString()}`);
     }
     return [];
   }
