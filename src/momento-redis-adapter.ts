@@ -166,6 +166,18 @@ export interface MomentoIORedis {
     ...args: [key: RedisKey, ...fields: (string | Buffer)[]]
   ): Promise<number>;
 
+  mset(
+    ...args: [
+      key: RedisKey,
+      value: string | Buffer | number,
+      ...keyValues: (RedisKey | string | Buffer | number)[]
+    ]
+  ): Promise<'OK'>;
+
+  mget(
+    ...args: [key: RedisKey, ...keys: RedisKey[]]
+  ): Promise<(string | null)[]>;
+
   flushdb(): Promise<'OK'>;
   flushdb(async: 'ASYNC'): Promise<'OK'>;
   flushdb(sync: 'SYNC'): Promise<'OK'>;
@@ -617,6 +629,36 @@ export class MomentoRedisAdapter
       this.emitError('hdel', `unexpected-response ${rsp.toString()}`);
       return 0;
     }
+  }
+
+  async mset(
+    ...args: [
+      key: RedisKey,
+      value: string | Buffer | number,
+      ...keyValues: (RedisKey | string | Buffer | number)[]
+    ]
+  ): Promise<'OK'> {
+    if (args.length % 2 !== 0) {
+      this.emitError(
+        'mset',
+        "wrong number of arguments for 'mset' command",
+        MomentoErrorCode.INVALID_ARGUMENT_ERROR
+      );
+    }
+    for (let i = 0; i < args.length; i += 2) {
+      await this.set(args[i] as RedisKey, args[i + 1]);
+    }
+    return 'OK';
+  }
+
+  async mget(
+    ...args: [key: RedisKey, ...keys: RedisKey[]]
+  ): Promise<(string | null)[]> {
+    const promises: Promise<string | null>[] = [];
+    args.forEach(key => {
+      promises.push(this.get(key));
+    });
+    return await Promise.all(promises);
   }
 
   async ttl(key: RedisKey): Promise<number | null> {
