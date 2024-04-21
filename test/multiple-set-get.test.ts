@@ -30,11 +30,7 @@ describe('multiple get and set', () => {
 
     // Get multiple keys
     const getResp = await client.mget(key1, key2);
-    if (process.env.MOMENTO_ENABLED === 'true') {
-      expect(getResp).toEqual([value]);
-    } else {
-      expect(getResp).toEqual([value, null]);
-    }
+    expect(getResp).toEqual([value, null]);
   });
 
   it('should emit error when wrong number of arguments provided', async () => {

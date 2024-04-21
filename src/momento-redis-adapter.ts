@@ -695,15 +695,29 @@ export class MomentoRedisAdapter
 
     if (resp instanceof CacheGetBatch.Success) {
       const keyValueRecord = resp.valuesRecordStringUint8Array();
-      const maybeCompressedValues = Object.values(keyValueRecord);
+      const maybeCompressedValues: (Uint8Array | null)[] = [];
+
+      for (const key of args) {
+        if ((key as string) in keyValueRecord) {
+          maybeCompressedValues.push(keyValueRecord[key as string]);
+        } else {
+          maybeCompressedValues.push(null);
+        }
+      }
+
       if (this.useCompression) {
         return await Promise.all(
           maybeCompressedValues.map(async value => {
-            return await decompress(value);
+            if (value !== null) {
+              return await decompress(value);
+            }
+            return null;
           })
         );
       } else {
-        return Object.values(resp.values());
+        return maybeCompressedValues.map(value =>
+          value !== null ? new TextDecoder().decode(value) : null
+        );
       }
     } else if (resp instanceof CacheGetBatch.Error) {
       this.emitError('mget', resp.message(), resp.errorCode());
