@@ -50,7 +50,7 @@ describe('multiple get and set', () => {
         expect(momentoError.code).toBe('ERR_UNHANDLED_ERROR');
         expect(momentoError.context.code).toBe('INVALID_ARGUMENT_ERROR');
         expect(momentoError.context.msg).toBe(
-          "wrong number of arguments for 'mset' command"
+          "Wrong number of arguments for 'mset' command"
         );
         expect(momentoError.context.op).toBe('mset');
         expect(momentoError.context.platform).toBe('momento');

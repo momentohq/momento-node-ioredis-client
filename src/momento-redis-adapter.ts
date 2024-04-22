@@ -9,9 +9,11 @@ import {
   CacheDictionarySetFields,
   CacheFlush,
   CacheGet,
+  CacheGetBatch,
   CacheIncrement,
   CacheItemGetTtl,
   CacheSet,
+  CacheSetBatch,
   CacheSetIfAbsent,
   CacheUpdateTtl,
   MomentoErrorCode,
@@ -641,24 +643,88 @@ export class MomentoRedisAdapter
     if (args.length % 2 !== 0) {
       this.emitError(
         'mset',
-        "wrong number of arguments for 'mset' command",
+        "Wrong number of arguments for 'mset' command",
         MomentoErrorCode.INVALID_ARGUMENT_ERROR
       );
     }
+
+    const keys: RedisKey[] = [];
+    const maybeCompressedValues: (string | Promise<Uint8Array>)[] = [];
+
     for (let i = 0; i < args.length; i += 2) {
-      await this.set(args[i] as RedisKey, args[i + 1]);
+      keys.push(args[i] as RedisKey);
+      const value = args[i + 1];
+      if (this.useCompression) {
+        maybeCompressedValues.push(compress(value));
+      } else {
+        maybeCompressedValues.push(String(value));
+      }
     }
-    return 'OK';
+
+    let values: (string | Uint8Array)[];
+    if (this.useCompression) {
+      values = await Promise.all(maybeCompressedValues);
+    } else {
+      values = maybeCompressedValues as string[];
+    }
+
+    const items = new Map<RedisKey, Uint8Array | string>();
+    for (let i = 0; i < keys.length; i++) {
+      items.set(
+        keys[i],
+        this.useCompression ? values[i] : Buffer.from(values[i] as string)
+      );
+    }
+
+    const rsp = await this.momentoClient.setBatch(this.cacheName, items);
+    if (rsp instanceof CacheSetBatch.Success) {
+      return 'OK';
+    } else if (rsp instanceof CacheSetBatch.Error) {
+      this.emitError('mset', rsp.message(), rsp.errorCode());
+      return 'OK';
+    } else {
+      this.emitError('mset', `unexpected-response ${rsp.toString()}`);
+      return 'OK';
+    }
   }
 
   async mget(
     ...args: [key: RedisKey, ...keys: RedisKey[]]
   ): Promise<(string | null)[]> {
-    const promises: Promise<string | null>[] = [];
-    args.forEach(key => {
-      promises.push(this.get(key));
-    });
-    return await Promise.all(promises);
+    const resp = await this.momentoClient.getBatch(this.cacheName, args);
+
+    if (resp instanceof CacheGetBatch.Success) {
+      const keyValueRecord = resp.valuesRecordStringUint8Array();
+      const maybeCompressedValues: (Uint8Array | null)[] = [];
+
+      for (const key of args) {
+        if ((key as string) in keyValueRecord) {
+          maybeCompressedValues.push(keyValueRecord[key as string]);
+        } else {
+          maybeCompressedValues.push(null);
+        }
+      }
+
+      if (this.useCompression) {
+        return await Promise.all(
+          maybeCompressedValues.map(async value => {
+            if (value !== null) {
+              return await decompress(value);
+            }
+            return null;
+          })
+        );
+      } else {
+        return maybeCompressedValues.map(value =>
+          value !== null ? new TextDecoder().decode(value) : null
+        );
+      }
+    } else if (resp instanceof CacheGetBatch.Error) {
+      this.emitError('mget', resp.message(), resp.errorCode());
+    } else {
+      this.emitError('mget', `unexpected-response ${resp.toString()}`);
+    }
+    return [];
   }
 
   async ttl(key: RedisKey): Promise<number | null> {
