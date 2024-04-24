@@ -184,6 +184,8 @@ export interface MomentoIORedis {
   flushdb(async: 'ASYNC'): Promise<'OK'>;
   flushdb(sync: 'SYNC'): Promise<'OK'>;
 
+  unlink(...args: [...keys: RedisKey[]]): Promise<number>;
+
   quit(): Promise<'OK'>;
 }
 
@@ -803,6 +805,11 @@ export class MomentoRedisAdapter
     }
 
     return 0;
+  }
+
+  async unlink(...args: [...keys: RedisKey[]]): Promise<number> {
+    await this.del(...args);
+    return args.length;
   }
 
   async flushdb(): Promise<'OK'> {
