@@ -233,3 +233,30 @@ describe('setex', () => {
     expect(getResult2).toBeNull();
   });
 });
+
+describe('unlink', () => {
+  it('happy path set get update unlink test', async () => {
+    const key = v4();
+    const value1 = v4();
+    const value2 = v4();
+    // Set initial key value
+    await client.set(key, value1);
+
+    // Get value
+    let result = await client.get(key);
+    expect(result).toEqual(value1);
+
+    // Update value
+    await client.set(key, value2);
+
+    // Read updated value
+    result = await client.get(key);
+    expect(result).toEqual(value2);
+    // Unlink key aka "Delete"
+    await client.unlink(key);
+
+    // Should get null back now
+    result = await client.get(key);
+    expect(result).toBeNull();
+  });
+});
