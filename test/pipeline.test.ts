@@ -27,7 +27,12 @@ describe('pipelines', () => {
       .get(key2)
       .exec();
 
-    expect(results).toEqual([value1, value2, value1, value2]);
+    expect(results).toEqual([
+      [null, value1],
+      [null, value2],
+      [null, value1],
+      [null, value2],
+    ]);
   });
   it('should be able to run with batch load commands', async () => {
     const key1 = v4();
@@ -54,7 +59,12 @@ describe('pipelines', () => {
       ])
       .exec();
 
-    expect(results).toEqual([value1, value2, value1, value2]);
+    expect(results).toEqual([
+      [null, value1],
+      [null, value2],
+      [null, value1],
+      [null, value2],
+    ]);
   });
 
   it('you should be able to mix commands', async () => {
@@ -95,14 +105,14 @@ describe('pipelines', () => {
       .exec();
 
     expect(results).toEqual([
-      value1,
-      value2,
-      value3,
-      value4,
-      value1,
-      value2,
-      value3,
-      value4,
+      [null, value1],
+      [null, value2],
+      [null, value3],
+      [null, value4],
+      [null, value1],
+      [null, value2],
+      [null, value3],
+      [null, value4],
     ]);
   });
   it('throws an error when using an un supported command', async () => {

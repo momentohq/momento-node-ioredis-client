@@ -93,7 +93,7 @@ class Pipeline extends Commander<{type: 'pipeline'}> {
 
     async function execPipeline() {
       for (let i = 0; i < _this._queue.length; ++i) {
-        _this._result.push(await _this._queue[i].promise);
+        _this._result.push([null, await _this._queue[i].promise]);
       }
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
