@@ -109,9 +109,15 @@ describe('pipelines', () => {
     try {
       await client.pipeline([['UNSUPPORTED_CMD']]).exec();
     } catch (err) {
-      expect(err).toEqual(
-        new Error('Un-Supported Command Passed: UNSUPPORTED_CMD')
-      );
+      if (process.env.MOMENTO_ENABLED === 'true') {
+        expect(err).toEqual(
+          new Error('Un-Supported Command Passed: UNSUPPORTED_CMD')
+        );
+      } else {
+        expect(err).toEqual(
+          new TypeError("Cannot read properties of undefined (reading 'apply')")
+        );
+      }
     }
   });
 });
