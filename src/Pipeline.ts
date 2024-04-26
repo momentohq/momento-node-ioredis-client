@@ -13,7 +13,6 @@ class Pipeline extends Commander<{type: 'pipeline'}> {
   resolve: (result: [error: Error | null, result: unknown][] | null) => void;
   reject: (error: Error) => void;
 
-  replyPending = 0;
   private _queue: Array<Command> = [];
   private _result: Array<unknown> = [];
 
@@ -51,17 +50,15 @@ class Pipeline extends Commander<{type: 'pipeline'}> {
       const commandName = command[0] as string;
       const args = command.slice(1) as ArgumentType[];
 
-      // FIXME add some validation upfront on momento supported commands
-
-      const cmdToQueue = new Command(commandName, args);
 
       // Invoke Command
+      const cmdToQueue = new Command(commandName, args);
       cmdToQueue.promise = this.invokeMomentoRedisClient(
         cmdToQueue.name,
         cmdToQueue.args
       );
 
-      // Push command with promise for return to queue
+      // Push command with promise to queue
       cmdToQueue.pipelineIndex = this._queue.length;
       this._queue.push(cmdToQueue);
     }
