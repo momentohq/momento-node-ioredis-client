@@ -71,13 +71,13 @@ class Pipeline extends Commander<{type: 'pipeline'}> {
   ): Promise<unknown> {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (this.momentoAdapter[`${name}`] === undefined) {
+    if (this.momentoAdapter[name] === undefined) {
       throw new Error(`Un-Supported Command Passed: ${name}`);
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    return this.momentoAdapter[`${name}`](...args); // eslint-disable-line @typescript-eslint/no-unsafe-return
+    return this.momentoAdapter[name](...args); // eslint-disable-line @typescript-eslint/no-unsafe-return
   }
 
   exec(): Promise<[error: Error | null, result: unknown][] | null> {
