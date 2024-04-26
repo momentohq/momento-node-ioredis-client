@@ -50,7 +50,6 @@ class Pipeline extends Commander<{type: 'pipeline'}> {
       const commandName = command[0] as string;
       const args = command.slice(1) as ArgumentType[];
 
-
       // Invoke Command
       const cmdToQueue = new Command(commandName, args);
       cmdToQueue.promise = this.invokeMomentoRedisClient(
