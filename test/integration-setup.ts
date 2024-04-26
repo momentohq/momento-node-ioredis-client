@@ -1,13 +1,13 @@
 import {v4} from 'uuid';
 import {CacheClientProps} from '@gomomento/sdk/dist/src/cache-client-props';
 import {
-  CreateCache,
+  CacheClient,
+  CacheConfiguration,
   Configurations,
+  CreateCache,
+  CredentialProvider,
   DeleteCache,
   MomentoErrorCode,
-  CacheClient,
-  CredentialProvider,
-  CacheConfiguration,
 } from '@gomomento/sdk';
 import {MomentoIORedis, MomentoRedisAdapter, NewIORedisWrapper} from '../src';
 

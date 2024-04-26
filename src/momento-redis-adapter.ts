@@ -18,8 +18,10 @@ import {
   CacheUpdateTtl,
   MomentoErrorCode,
 } from '@gomomento/sdk';
-import {RedisKey} from 'ioredis';
+import {Command, RedisKey} from 'ioredis';
 import * as zstd from '@mongodb-js/zstd';
+import {ChainableCommander} from 'ioredis/built/utils/RedisCommander';
+import Pipeline from './Pipeline';
 
 const TEXT_DECODER = new TextDecoder();
 
@@ -181,10 +183,14 @@ export interface MomentoIORedis {
   ): Promise<(string | null)[]>;
 
   flushdb(): Promise<'OK'>;
+
   flushdb(async: 'ASYNC'): Promise<'OK'>;
+
   flushdb(sync: 'SYNC'): Promise<'OK'>;
 
   unlink(...args: [...keys: RedisKey[]]): Promise<number>;
+
+  pipeline(commands?: Array<Array<any>>): ChainableCommander;
 
   quit(): Promise<'OK'>;
 }
@@ -823,6 +829,14 @@ export class MomentoRedisAdapter
       this.emitError('flushdb', `unexpected-response ${rsp.toString()}`);
       return 'OK';
     }
+  }
+
+  pipeline(commands?: Command[][]): ChainableCommander {
+    const pipeline = new Pipeline(this);
+    if (Array.isArray(commands)) {
+      pipeline.addBatch(commands);
+    }
+    return pipeline;
   }
 }
 
