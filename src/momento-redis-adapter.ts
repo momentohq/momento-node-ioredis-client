@@ -18,8 +18,10 @@ import {
   CacheUpdateTtl,
   MomentoErrorCode,
 } from '@gomomento/sdk';
-import {RedisKey} from 'ioredis';
+import {Command, RedisKey} from 'ioredis';
 import * as zstd from '@mongodb-js/zstd';
+import {ChainableCommander} from 'ioredis/built/utils/RedisCommander';
+import Pipeline from './Pipeline';
 
 const TEXT_DECODER = new TextDecoder();
 
@@ -181,10 +183,19 @@ export interface MomentoIORedis {
   ): Promise<(string | null)[]>;
 
   flushdb(): Promise<'OK'>;
+
   flushdb(async: 'ASYNC'): Promise<'OK'>;
+
   flushdb(sync: 'SYNC'): Promise<'OK'>;
 
   unlink(...args: [...keys: RedisKey[]]): Promise<number>;
+
+  // TODO using type <any> here causes lint errors see if way to tighten up
+  // TODO currently we pass back ChainableCommander here which means we dont get
+  // TODO compile time checks on what methods are supported by the MomentoIORedis
+  // TODO interface. We could try defining our own ChainableMomento interface
+  // TODO instead here potentially
+  pipeline(commands?: Array<Array<any>>): ChainableCommander;
 
   quit(): Promise<'OK'>;
 }
@@ -823,6 +834,17 @@ export class MomentoRedisAdapter
       this.emitError('flushdb', `unexpected-response ${rsp.toString()}`);
       return 'OK';
     }
+  }
+
+  pipeline(commands?: Command[][]): ChainableCommander {
+    const pipeline = new Pipeline(this);
+    // This is behavior of silently not adding commands and returning empty
+    // pipeline if an array is not passed is ported from IORedis initial
+    // implementation. Trying to keep behavior the same for now.
+    if (Array.isArray(commands)) {
+      pipeline.addBatch(commands);
+    }
+    return pipeline;
   }
 }
 

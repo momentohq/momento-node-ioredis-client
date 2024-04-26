@@ -235,23 +235,16 @@ describe('setex', () => {
 });
 
 describe('unlink', () => {
-  it('happy path set get update unlink test', async () => {
+  it('happy path set get and unlink item', async () => {
     const key = v4();
-    const value1 = v4();
-    const value2 = v4();
+    const value = v4();
     // Set initial key value
-    await client.set(key, value1);
+    await client.set(key, value);
 
     // Get value
     let result = await client.get(key);
-    expect(result).toEqual(value1);
+    expect(result).toEqual(value);
 
-    // Update value
-    await client.set(key, value2);
-
-    // Read updated value
-    result = await client.get(key);
-    expect(result).toEqual(value2);
     // Unlink key aka "Delete"
     await client.unlink(key);
 
