@@ -28,6 +28,7 @@ describe('pipelines', () => {
       .exec();
 
     expect(results).toEqual([
+      // IORedis defines exec response as [err, result]
       [null, value1],
       [null, value2],
       [null, value1],
@@ -60,6 +61,7 @@ describe('pipelines', () => {
       .exec();
 
     expect(results).toEqual([
+      // IORedis defines exec response as [err, result]
       [null, value1],
       [null, value2],
       [null, value1],
@@ -105,6 +107,7 @@ describe('pipelines', () => {
       .exec();
 
     expect(results).toEqual([
+      // IORedis defines exec response as [err, result]
       [null, value1],
       [null, value2],
       [null, value3],

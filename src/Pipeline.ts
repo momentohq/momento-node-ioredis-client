@@ -8,6 +8,13 @@ interface Pipeline {
   length: number;
 }
 
+/**
+ * Pipeline class is an object passed back when a user calls client.pipeline()
+ * it extends the base IORedis Commander interface and overrides the sendMessage
+ * function so that you can then chain multiple redis commands together and under
+ * the hood will batch up all the chained commands and then execute them in
+ * parallel.
+ */
 class Pipeline extends Commander<{type: 'pipeline'}> {
   promise: Promise<[error: Error | null, result: unknown][] | null>;
   resolve: (result: [error: Error | null, result: unknown][] | null) => void;
