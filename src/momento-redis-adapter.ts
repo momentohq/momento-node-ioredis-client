@@ -256,8 +256,9 @@ export class MomentoRedisAdapter
     return null;
   }
 
+  // eslint-disable-next-line require-await, @typescript-eslint/require-await
   async quit(): Promise<'OK'> {
-    await this.momentoClient.close()
+    this.momentoClient.close();
     return 'OK';
   }
 

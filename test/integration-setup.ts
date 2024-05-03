@@ -84,7 +84,7 @@ function setupIntegrationTestWithMomento() {
     cacheName,
     {
       useCompression: useCompression(),
-    },
+    }
   );
 
   return {
