@@ -54,6 +54,21 @@ describe('hash', () => {
     expect(getResult).toEqual({[field]: String(value)});
   });
 
+  it('should accept an array of fields to set', async () => {
+    const key = v4();
+    const field1 = v4();
+    const value1 = v4();
+    const field2 = v4();
+    const value2 = v4();
+    await client.hmset(key, [field1, value1, field2, value2]);
+
+    const rsp = await client.hgetall(key);
+    expect(rsp[field1]).toEqual(value1);
+    expect(rsp[field2]).toEqual(value2);
+
+    const rsp2 = await client.hget(key, field1);
+    expect(rsp2).toEqual(value1);
+  });
   it('should accept a number field and buffer value pair on hset', async () => {
     const key = v4();
     const field = 42;
