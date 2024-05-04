@@ -258,7 +258,7 @@ export class MomentoRedisAdapter
 
   // eslint-disable-next-line require-await, @typescript-eslint/require-await
   async quit(): Promise<'OK'> {
-    // @ Noop for now.
+    this.momentoClient.close();
     return 'OK';
   }
 
@@ -474,6 +474,7 @@ export class MomentoRedisAdapter
   ): Promise<number> {
     let fieldsToSet: Map<string | Uint8Array, string | Uint8Array> = new Map();
     const dictionaryName = String(args[0]);
+
     if (typeof args[1] === 'object') {
       if (args[1] instanceof Map) {
         for (const [key, value] of args[1]) {
@@ -484,14 +485,26 @@ export class MomentoRedisAdapter
         }
       } else {
         fieldsToSet = new Map<string | Uint8Array, string | Uint8Array>();
-        const entries = Object.entries(args[1]);
-        for (const [key, value] of entries) {
-          fieldsToSet.set(
-            String(key),
-            this.useCompression
-              ? await compress(value as string | Buffer | number)
-              : String(value)
-          );
+        if (Array.isArray(args[1])) {
+          const list = args[1];
+          for (let i = 0; i < list.length; i += 2) {
+            fieldsToSet.set(
+              String(list[i]),
+              this.useCompression
+                ? await compress(list[i + 1] as string | Buffer | number)
+                : String(list[i + 1])
+            );
+          }
+        } else {
+          const entries = Object.entries(args[1]);
+          for (const [key, value] of entries) {
+            fieldsToSet.set(
+              String(key),
+              this.useCompression
+                ? await compress(value as string | Buffer | number)
+                : String(value)
+            );
+          }
         }
       }
     } else {
