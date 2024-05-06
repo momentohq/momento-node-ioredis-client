@@ -110,29 +110,23 @@ export interface MomentoIORedis {
 
   pexpire(key: RedisKey, milliseconds: number): Promise<number | null>;
 
-  pexpire(
-    key: RedisKey,
-    milliseconds: number,
-    nx: 'NX'
-  ): Promise<number | null>;
+  pexpire(key: RedisKey, milliseconds: number, nx: 'NX'): Promise<number>;
 
-  pexpire(
-    key: RedisKey,
-    milliseconds: number,
-    xx: 'XX'
-  ): Promise<number | null>;
+  pexpire(key: RedisKey, milliseconds: number, xx: 'XX'): Promise<number>;
 
-  pexpire(
-    key: RedisKey,
-    milliseconds: number,
-    gt: 'GT'
-  ): Promise<number | null>;
+  pexpire(key: RedisKey, milliseconds: number, gt: 'GT'): Promise<number>;
 
-  pexpire(
-    key: RedisKey,
-    milliseconds: number,
-    lt: 'LT'
-  ): Promise<number | null>;
+  pexpire(key: RedisKey, milliseconds: number, lt: 'LT'): Promise<number>;
+
+  expire(key: RedisKey, seconds: number): Promise<number>;
+
+  expire(key: RedisKey, seconds: number, nx: 'NX'): Promise<number>;
+
+  expire(key: RedisKey, seconds: number, xx: 'XX'): Promise<number>;
+
+  expire(key: RedisKey, seconds: number, gt: 'GT'): Promise<number>;
+
+  expire(key: RedisKey, seconds: number, lt: 'LT'): Promise<number>;
 
   del(...args: [...keys: RedisKey[]]): Promise<number>;
 
@@ -785,7 +779,7 @@ export class MomentoRedisAdapter
     key: RedisKey,
     milliseconds: number,
     ttlFlagIdentifier?: 'NX' | 'XX' | 'GT' | 'LT'
-  ): Promise<number | null> {
+  ): Promise<number> {
     let shouldUpdateTtl = true;
 
     if (ttlFlagIdentifier === 'NX') {
@@ -829,6 +823,14 @@ export class MomentoRedisAdapter
     }
 
     return 0;
+  }
+
+  async expire(
+    key: RedisKey,
+    seconds: number,
+    ttlFlagIdentifier?: 'NX' | 'XX' | 'GT' | 'LT'
+  ): Promise<number> {
+    return await this.pexpire(key, seconds * 1000, ttlFlagIdentifier);
   }
 
   async unlink(...args: [...keys: RedisKey[]]): Promise<number> {
