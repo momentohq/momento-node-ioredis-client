@@ -214,7 +214,7 @@ describe('expire', () => {
     await client.set(key, value, 'EX', 5);
 
     // Set ttl of key
-    const expireRsp = await client.expire(key, 1);
+    const expireRsp = await client.expire(key, 10);
     expect(expireRsp).toBe(1);
 
     // Get ttl of key
