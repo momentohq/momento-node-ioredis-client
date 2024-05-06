@@ -187,6 +187,12 @@ describe('pexpire', () => {
     const pexpireRsp = await client.pexpire(key1, 10000, 'LT');
     expect(pexpireRsp).toBe(0);
   });
+
+  it('should return 0 using pexpire when key does not exist', async () => {
+    // Set ttl of non-existent key
+    const pexpireRsp = await client.pexpire(v4(), 10000);
+    expect(pexpireRsp).toBe(0);
+  });
 });
 
 describe('expire', () => {
@@ -371,6 +377,12 @@ describe('expire', () => {
 
     // Set ttl of key using lt flag
     const expireRsp = await client.expire(key1, 10, 'LT');
+    expect(expireRsp).toBe(0);
+  });
+
+  it('should return 0 using expire when key does not exist', async () => {
+    // Set ttl of non-existent key
+    const expireRsp = await client.expire(v4(), 10000);
     expect(expireRsp).toBe(0);
   });
 });
