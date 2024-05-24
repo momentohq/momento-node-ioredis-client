@@ -19,7 +19,7 @@ import {
   MomentoErrorCode,
 } from '@gomomento/sdk';
 import {Command, RedisKey} from 'ioredis';
-import * as zstd from '@mongodb-js/zstd';
+import * as zlib from 'zlib';
 import {ChainableCommander} from 'ioredis/built/utils/RedisCommander';
 import Pipeline from './Pipeline';
 
@@ -864,11 +864,36 @@ export class MomentoRedisAdapter
 }
 
 async function decompress(compressed: Uint8Array): Promise<string> {
-  return (await zstd.decompress(Buffer.from(compressed))).toString();
+  const decompressedPromise = new Promise<Uint8Array>((resolve, reject) => {
+    zlib.gunzip(Buffer.from(compressed), (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+  return Buffer.from(await decompressedPromise).toString();
 }
 
 async function compress(value: string | Buffer | number): Promise<Uint8Array> {
   const buffer =
     value instanceof Buffer ? value : Buffer.from(value.toString());
-  return await zstd.compress(buffer);
+  const compressionPromise = new Promise<Uint8Array>((resolve, reject) => {
+    zlib.gzip(
+      buffer,
+      {
+        // TODO make compression level configurable default to balanced for now
+        level: zlib.constants.Z_DEFAULT_COMPRESSION,
+      },
+      (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+  return await compressionPromise;
 }
