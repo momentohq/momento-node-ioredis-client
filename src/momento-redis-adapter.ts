@@ -172,13 +172,9 @@ export interface MomentoIORedis {
     ]
   ): Promise<'OK'>;
 
-  mget(
-    ...args: [...keys: RedisKey[]]
-  ): Promise<(string | null)[]>;
+  mget(...args: [...keys: RedisKey[]]): Promise<(string | null)[]>;
 
-  mget(
-    ...args: [keys: RedisKey[]]
-  ): Promise<(string | null)[]>;
+  mget(...args: [keys: RedisKey[]]): Promise<(string | null)[]>;
 
   flushdb(): Promise<'OK'>;
 
@@ -712,15 +708,12 @@ export class MomentoRedisAdapter
     }
   }
 
-  async mget(
-    ...args: [RedisKey[]] | RedisKey[]
-  ): Promise<(string | null)[]> {
-
+  async mget(...args: [RedisKey[]] | RedisKey[]): Promise<(string | null)[]> {
     let resp: CacheGetBatch.Response;
-    if (Array.isArray(args[0])){
+    if (Array.isArray(args[0])) {
       resp = await this.momentoClient.getBatch(this.cacheName, args[0]);
-    }else {
-      let keysToGet = args.map(value => value as RedisKey)
+    } else {
+      const keysToGet = args.map(value => value as RedisKey);
       resp = await this.momentoClient.getBatch(this.cacheName, keysToGet);
     }
 
