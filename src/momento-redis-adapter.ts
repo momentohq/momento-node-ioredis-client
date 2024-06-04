@@ -709,19 +709,19 @@ export class MomentoRedisAdapter
   }
 
   async mget(...args: [RedisKey[]] | RedisKey[]): Promise<(string | null)[]> {
-    let resp: CacheGetBatch.Response;
+    let keysToGet: Array<RedisKey> = [];
     if (Array.isArray(args[0])) {
-      resp = await this.momentoClient.getBatch(this.cacheName, args[0]);
+      keysToGet = args[0];
     } else {
-      const keysToGet = args.map(value => value as RedisKey);
-      resp = await this.momentoClient.getBatch(this.cacheName, keysToGet);
+      keysToGet = args.map(value => value as RedisKey);
     }
 
+    const resp = await this.momentoClient.getBatch(this.cacheName, keysToGet);
     if (resp instanceof CacheGetBatch.Success) {
       const keyValueRecord = resp.valuesRecordStringUint8Array();
       const maybeCompressedValues: (Uint8Array | null)[] = [];
 
-      for (const key of args) {
+      for (const key of keysToGet) {
         if ((key as string) in keyValueRecord) {
           maybeCompressedValues.push(keyValueRecord[key as string]);
         } else {
