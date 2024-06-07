@@ -1,4 +1,4 @@
-import {EventEmitter} from 'stream';
+import {EventEmitter} from 'events';
 import {
   CacheClient,
   CacheDelete,
@@ -25,7 +25,7 @@ import Pipeline from './Pipeline';
 
 const TEXT_DECODER = new TextDecoder();
 
-export interface MomentoIORedis {
+export interface MomentoIORedis extends EventEmitter {
   get(key: RedisKey): Promise<string | null>;
 
   set(key: RedisKey, value: string | Buffer | number): Promise<'OK' | null>;
@@ -192,6 +192,8 @@ export interface MomentoIORedis {
   pipeline(commands?: Array<Array<any>>): ChainableCommander;
 
   quit(): Promise<'OK'>;
+
+  disconnect(reconnect?: boolean): void;
 }
 
 export interface MomentoRedisAdapterOptions {
@@ -254,6 +256,10 @@ export class MomentoRedisAdapter
   async quit(): Promise<'OK'> {
     this.momentoClient.close();
     return 'OK';
+  }
+
+  disconnect(reconnect?: boolean): void {
+    return; //noop for this for now. TODO Decide if we want to close and remake client or not.
   }
 
   emitError(op: string, msg: string, code?: MomentoErrorCode) {
