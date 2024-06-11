@@ -255,11 +255,15 @@ export class MomentoRedisAdapter
   // eslint-disable-next-line require-await, @typescript-eslint/require-await
   async quit(): Promise<'OK'> {
     this.momentoClient.close();
+    this.emit('end')
     return 'OK';
   }
 
   disconnect(reconnect?: boolean): void {
-    return; //noop for this for now. TODO Decide if we want to close and remake client or not.
+    // TODO handle reconnect event. re-make momento client?
+    this.momentoClient.close();
+    this.emit('end')
+    return
   }
 
   emitError(op: string, msg: string, code?: MomentoErrorCode) {
