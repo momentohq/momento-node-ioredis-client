@@ -27,7 +27,7 @@
     "prettier": "^3.2.5"
   },
   "dependencies": {
-    "@gomomento-poc/node-ioredis-client": "^0.8.0",
+    "@gomomento-poc/node-ioredis-client": "^0.17.0",
     "typescript": "^5.4.5"
   },
   "engines": {
