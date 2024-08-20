@@ -24,7 +24,7 @@ jobs:
         node: [16, 18, 20]
         compression: [true, false]
     name: Test on Node ${{ matrix.node }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       MOMENTO_API_KEY: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
       CACHE_NAME: js-io-redis-client-test-ci
