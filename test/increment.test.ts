@@ -48,9 +48,11 @@ describe('increment', () => {
         };
         expect(momentoError.code).toBe('ERR_UNHANDLED_ERROR');
         expect(momentoError.context.code).toBe('FAILED_PRECONDITION_ERROR');
-        expect(momentoError.context.msg).toBe(
-          "System is not in a state required for the operation's execution: 9 FAILED_PRECONDITION: failed to parse value into long"
-        );
+        // Matched loosely: the exact wording is the service's, not our contract.
+        // It has already moved once, from "into long" to "into an integer",
+        // which fails a toBe() assertion without anything having regressed.
+        expect(momentoError.context.msg).toContain('FAILED_PRECONDITION');
+        expect(momentoError.context.msg).toContain('failed to parse value');
         expect(momentoError.context.op).toBe('incr');
         expect(momentoError.context.platform).toBe('momento');
       } else {
