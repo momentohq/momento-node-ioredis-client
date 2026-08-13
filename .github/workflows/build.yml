@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MOMENTO_API_KEY: ${{ secrets.ALPHA_TEST_AUTH_TOKEN }}
-      CACHE_NAME: js-io-redis-client-test-ci
+      CACHE_NAME: js-io-redis-client-test-ci-${{ matrix.node }}-${{ matrix.compression }}
       COMPRESSION: ${{ matrix.compression }}
 
     steps:
